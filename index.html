@@ -10,6 +10,7 @@
 
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 
 <style>
   :root {
@@ -24,7 +25,6 @@
     --text-muted: #556075;
     --accent: #f59e0b;
     --accent-dim: rgba(245,158,11,0.12);
-    --accent-glow: rgba(245,158,11,0.25);
     --danger: #ef4444;
     --danger-dim: rgba(239,68,68,0.12);
     --success: #22c55e;
@@ -34,491 +34,278 @@
     --extend: #a855f7;
     --extend-dim: rgba(168,85,247,0.12);
   }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
+  * { margin:0; padding:0; box-sizing:border-box; }
   body {
-    font-family: 'Outfit', sans-serif;
-    background: var(--bg-deep);
-    color: var(--text-primary);
-    min-height: 100vh;
-    overflow-x: hidden;
+    font-family:'Outfit',sans-serif;
+    background:var(--bg-deep);
+    color:var(--text-primary);
+    min-height:100vh;
+    overflow-x:hidden;
   }
+  ::-webkit-scrollbar { width:6px; }
+  ::-webkit-scrollbar-track { background:var(--bg-main); }
+  ::-webkit-scrollbar-thumb { background:var(--border-light); border-radius:3px; }
 
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: var(--bg-main); }
-  ::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 3px; }
-  ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+  /* ========== LOGIN SCREEN ========== */
+  .login-screen {
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+  }
+  .login-screen::before {
+    content:'';
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    background:
+      radial-gradient(circle at 30% 40%, rgba(245,158,11,0.08) 0%, transparent 50%),
+      radial-gradient(circle at 70% 60%, rgba(168,85,247,0.06) 0%, transparent 50%);
+  }
+  .login-box {
+    background:var(--bg-card);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:40px;
+    width:420px;
+    max-width:90vw;
+    position:relative;
+    z-index:1;
+    animation:scale-in 0.4s cubic-bezier(0.16,1,0.3,1);
+  }
+  .login-box .logo-row {
+    display:flex; align-items:center; gap:12px; margin-bottom:8px;
+  }
+  .login-box .logo-icon {
+    width:44px; height:44px;
+    background:var(--accent);
+    border-radius:11px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:20px; color:#000;
+  }
+  .login-box h1 { font-size:24px; font-weight:800; letter-spacing:-0.5px; }
+  .login-box .sub { font-size:12px; color:var(--text-muted); margin-bottom:28px; }
+  .login-field {
+    margin-bottom:16px;
+  }
+  .login-field label {
+    display:block; font-size:12px; font-weight:600;
+    color:var(--text-secondary); margin-bottom:6px;
+    text-transform:uppercase; letter-spacing:0.8px;
+  }
+  .login-field input {
+    width:100%;
+    background:var(--bg-main); border:1px solid var(--border);
+    border-radius:8px; padding:12px 14px;
+    color:var(--text-primary); font-size:14px;
+    font-family:'Outfit',sans-serif;
+    outline:none; transition:border-color 0.2s;
+  }
+  .login-field input:focus { border-color:var(--accent); }
+  .login-field input::placeholder { color:var(--text-muted); }
+  .login-btn {
+    width:100%;
+    padding:13px; border-radius:9px;
+    font-size:15px; font-weight:700;
+    font-family:'Outfit',sans-serif;
+    cursor:pointer; border:none;
+    background:var(--accent); color:#000;
+    transition:all 0.2s;
+    margin-top:8px;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+  }
+  .login-btn:hover { filter:brightness(1.1); transform:translateY(-1px); }
+  .login-btn:disabled { opacity:0.5; cursor:not-allowed; transform:none; filter:none; }
+  .login-error {
+    background:var(--danger-dim); color:var(--danger);
+    border-radius:8px; padding:10px 14px;
+    font-size:13px; margin-top:12px;
+    display:none; align-items:center; gap:8px;
+  }
+  .login-error.show { display:flex; }
 
+  @keyframes scale-in { from{opacity:0;transform:scale(0.95)} to{opacity:1;transform:scale(1)} }
+  @keyframes fade-in { from{opacity:0} to{opacity:1} }
+
+  /* ========== ADMIN LAYOUT ========== */
   .admin-layout {
-    display: grid;
-    grid-template-columns: 260px 1fr;
-    min-height: 100vh;
+    display:grid;
+    grid-template-columns:260px 1fr;
+    min-height:100vh;
   }
-
   .sidebar {
-    background: var(--bg-main);
-    border-right: 1px solid var(--border);
-    padding: 24px 0;
-    display: flex;
-    flex-direction: column;
-    position: sticky;
-    top: 0;
-    height: 100vh;
-    overflow-y: auto;
+    background:var(--bg-main);
+    border-right:1px solid var(--border);
+    padding:24px 0;
+    display:flex; flex-direction:column;
+    position:sticky; top:0; height:100vh; overflow-y:auto;
   }
-
-  .sidebar-logo {
-    padding: 0 24px;
-    margin-bottom: 32px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
-  .logo-icon {
-    width: 40px; height: 40px;
-    background: var(--accent);
-    border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px; color: #000; font-weight: 800;
-  }
-
-  .sidebar-logo h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; }
-  .sidebar-logo .sub { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; }
-
-  .nav-section { padding: 0 12px; margin-bottom: 8px; }
-
-  .nav-label {
-    font-size: 10px; font-weight: 600; color: var(--text-muted);
-    text-transform: uppercase; letter-spacing: 1.5px;
-    padding: 0 12px; margin-bottom: 8px;
-  }
-
+  .sidebar-logo { padding:0 24px; margin-bottom:32px; display:flex; align-items:center; gap:12px; }
+  .logo-icon { width:40px;height:40px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;color:#000;font-weight:800; }
+  .sidebar-logo h1 { font-size:20px; font-weight:700; letter-spacing:-0.5px; }
+  .sidebar-logo .sub { font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1.5px; }
+  .nav-section { padding:0 12px; margin-bottom:8px; }
+  .nav-label { font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:1.5px;padding:0 12px;margin-bottom:8px; }
   .nav-item {
-    display: flex; align-items: center; gap: 12px;
-    padding: 10px 12px; border-radius: 8px;
-    cursor: pointer; transition: all 0.2s;
-    color: var(--text-secondary); font-size: 14px; font-weight: 500;
-    position: relative;
+    display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:8px;
+    cursor:pointer;transition:all 0.2s;color:var(--text-secondary);font-size:14px;font-weight:500;position:relative;
   }
-
-  .nav-item:hover { background: var(--bg-card); color: var(--text-primary); }
-  .nav-item.active { background: var(--accent-dim); color: var(--accent); }
-
+  .nav-item:hover { background:var(--bg-card);color:var(--text-primary); }
+  .nav-item.active { background:var(--accent-dim);color:var(--accent); }
   .nav-item.active::before {
-    content: '';
-    position: absolute; left: -12px; top: 50%; transform: translateY(-50%);
-    width: 3px; height: 20px; background: var(--accent); border-radius: 0 3px 3px 0;
+    content:'';position:absolute;left:-12px;top:50%;transform:translateY(-50%);
+    width:3px;height:20px;background:var(--accent);border-radius:0 3px 3px 0;
   }
+  .nav-item i { width:20px;text-align:center;font-size:15px; }
+  .nav-badge { margin-left:auto;background:var(--accent);color:#000;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;min-width:20px;text-align:center; }
+  .sidebar-footer { margin-top:auto;padding:16px 24px;border-top:1px solid var(--border); }
+  .status-dot { width:8px;height:8px;background:var(--success);border-radius:50%;display:inline-block;margin-right:8px;animation:pulse-dot 2s infinite; }
+  @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:0.4} }
 
-  .nav-item i { width: 20px; text-align: center; font-size: 15px; }
+  .main-content { padding:32px;overflow-y:auto; }
+  .page-header { margin-bottom:32px; }
+  .page-header h2 { font-size:28px;font-weight:800;letter-spacing:-0.5px;margin-bottom:4px; }
+  .page-header p { color:var(--text-secondary);font-size:14px; }
 
-  .nav-badge {
-    margin-left: auto;
-    background: var(--accent); color: #000;
-    font-size: 10px; font-weight: 700;
-    padding: 2px 7px; border-radius: 10px;
-    min-width: 20px; text-align: center;
-  }
+  .stats-row { display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:32px; }
+  .stat-card { background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:20px;transition:all 0.3s; }
+  .stat-card:hover { border-color:var(--border-light);transform:translateY(-2px); }
+  .stat-icon { width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;margin-bottom:16px; }
+  .stat-value { font-size:28px;font-weight:800;letter-spacing:-1px;font-family:'JetBrains Mono',monospace; }
+  .stat-label { font-size:13px;color:var(--text-secondary);margin-top:4px; }
 
-  .sidebar-footer {
-    margin-top: auto;
-    padding: 16px 24px;
-    border-top: 1px solid var(--border);
-  }
+  .data-table-wrap { background:var(--bg-card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:24px; }
+  .table-header { padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px; }
+  .table-header h3 { font-size:16px;font-weight:600; }
+  .search-box { background:var(--bg-main);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text-primary);font-size:13px;font-family:'Outfit',sans-serif;width:220px;outline:none;transition:border-color 0.2s; }
+  .search-box:focus { border-color:var(--accent); }
+  .data-table { width:100%;border-collapse:collapse; }
+  .data-table th { text-align:left;padding:12px 20px;font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid var(--border);background:var(--bg-main); }
+  .data-table td { padding:14px 20px;font-size:14px;border-bottom:1px solid var(--border);vertical-align:middle; }
+  .data-table tr:last-child td { border-bottom:none; }
+  .data-table tr:hover td { background:var(--bg-card-hover); }
 
-  .status-dot {
-    width: 8px; height: 8px;
-    background: var(--success); border-radius: 50%;
-    display: inline-block; margin-right: 8px;
-    animation: pulse-dot 2s infinite;
-  }
+  .countdown-cell { display:flex;align-items:center;gap:10px; }
+  .countdown-bar { width:80px;height:6px;background:var(--bg-main);border-radius:3px;overflow:hidden; }
+  .countdown-bar-fill { height:100%;border-radius:3px;transition:width 1s linear; }
+  .countdown-text { font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;white-space:nowrap; }
 
-  @keyframes pulse-dot {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.4; }
-  }
+  .badge { display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px; }
+  .badge-active { background:var(--success-dim);color:var(--success); }
+  .badge-expiring { background:var(--accent-dim);color:var(--accent); }
+  .badge-expired { background:var(--danger-dim);color:var(--danger); }
+  .badge-extended { background:var(--extend-dim);color:var(--extend); }
 
-  .main-content { padding: 32px; overflow-y: auto; }
+  .btn { padding:7px 14px;border-radius:7px;font-size:12px;font-weight:600;font-family:'Outfit',sans-serif;cursor:pointer;border:none;transition:all 0.2s;display:inline-flex;align-items:center;gap:6px; }
+  .btn-danger { background:var(--danger-dim);color:var(--danger); }
+  .btn-danger:hover { background:var(--danger);color:#fff; }
+  .btn-accent { background:var(--accent-dim);color:var(--accent); }
+  .btn-accent:hover { background:var(--accent);color:#000; }
+  .btn-extend { background:var(--extend-dim);color:var(--extend); }
+  .btn-extend:hover { background:var(--extend);color:#fff; }
+  .btn-ghost { background:transparent;color:var(--text-secondary);border:1px solid var(--border); }
+  .btn-ghost:hover { background:var(--bg-card-hover);color:var(--text-primary); }
+  .btn-success { background:var(--success-dim);color:var(--success); }
+  .btn-success:hover { background:var(--success);color:#fff; }
 
-  .page-header { margin-bottom: 32px; }
-  .page-header h2 { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 4px; }
-  .page-header p { color: var(--text-secondary); font-size: 14px; }
+  .toast-container { position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px; }
+  .toast { background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:14px 18px;display:flex;align-items:center;gap:10px;font-size:13px;min-width:280px;max-width:420px;animation:toast-in 0.4s cubic-bezier(0.16,1,0.3,1);box-shadow:0 8px 30px rgba(0,0,0,0.4); }
+  .toast.removing { animation:toast-out 0.3s ease forwards; }
+  .toast i { font-size:16px;flex-shrink:0; }
+  .toast-success i { color:var(--success); }
+  .toast-danger i { color:var(--danger); }
+  .toast-info i { color:var(--info); }
+  .toast-extend i { color:var(--extend); }
+  @keyframes toast-in { from{opacity:0;transform:translateX(40px)} to{opacity:1;transform:translateX(0)} }
+  @keyframes toast-out { from{opacity:1;transform:translateX(0)} to{opacity:0;transform:translateX(40px)} }
 
-  .stats-row {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 16px;
-    margin-bottom: 32px;
-  }
+  .empty-state { text-align:center;padding:60px 20px;color:var(--text-muted); }
+  .empty-state i { font-size:48px;margin-bottom:16px;display:block; }
+  .empty-state p { font-size:14px; }
+  .avatar { width:36px;height:36px;border-radius:8px;background:var(--accent-dim);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--accent);flex-shrink:0; }
+  .user-cell { display:flex;align-items:center;gap:10px; }
+  .vehicle-thumb { width:60px;height:40px;border-radius:6px;overflow:hidden;background:var(--bg-main);display:flex;align-items:center;justify-content:center;flex-shrink:0; }
+  .vehicle-thumb img { width:100%;height:100%;object-fit:cover; }
+  .vehicle-thumb i { color:var(--text-muted);font-size:16px; }
+  .vehicle-cell { display:flex;align-items:center;gap:10px; }
+  .price { font-family:'JetBrains Mono',monospace;font-weight:600;color:var(--success); }
+  .auto-delete-label { font-size:10px;color:var(--text-muted);margin-top:2px; }
+  .extend-info-tag { display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;background:var(--extend-dim);color:var(--extend);text-transform:uppercase;letter-spacing:0.5px; }
 
-  .stat-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 20px;
-    transition: all 0.3s;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .stat-card:hover { border-color: var(--border-light); transform: translateY(-2px); }
-
-  .stat-icon {
-    width: 40px; height: 40px;
-    border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 16px; margin-bottom: 16px;
-  }
-
-  .stat-value {
-    font-size: 28px; font-weight: 800; letter-spacing: -1px;
-    font-family: 'JetBrains Mono', monospace;
-  }
-
-  .stat-label { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
-
-  .data-table-wrap {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    overflow: hidden;
-    margin-bottom: 24px;
-  }
-
-  .table-header {
-    padding: 16px 20px;
-    border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-
-  .table-header h3 { font-size: 16px; font-weight: 600; }
-
-  .search-box {
-    background: var(--bg-main); border: 1px solid var(--border);
-    border-radius: 8px; padding: 8px 12px;
-    color: var(--text-primary); font-size: 13px;
-    font-family: 'Outfit', sans-serif;
-    width: 220px; outline: none;
-    transition: border-color 0.2s;
-  }
-
-  .search-box:focus { border-color: var(--accent); }
-
-  .data-table { width: 100%; border-collapse: collapse; }
-
-  .data-table th {
-    text-align: left; padding: 12px 20px;
-    font-size: 11px; font-weight: 600;
-    color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;
-    border-bottom: 1px solid var(--border);
-    background: var(--bg-main);
-  }
-
-  .data-table td {
-    padding: 14px 20px; font-size: 14px;
-    border-bottom: 1px solid var(--border);
-    vertical-align: middle;
-  }
-
-  .data-table tr:last-child td { border-bottom: none; }
-  .data-table tr:hover td { background: var(--bg-card-hover); }
-
-  .countdown-cell { display: flex; align-items: center; gap: 10px; }
-
-  .countdown-bar {
-    width: 80px; height: 6px;
-    background: var(--bg-main); border-radius: 3px;
-    overflow: hidden;
-  }
-
-  .countdown-bar-fill { height: 100%; border-radius: 3px; transition: width 1s linear; }
-
-  .countdown-text {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12px; font-weight: 600;
-    white-space: nowrap;
-  }
-
-  .badge {
-    display: inline-flex; align-items: center; gap: 5px;
-    padding: 4px 10px; border-radius: 6px;
-    font-size: 11px; font-weight: 600;
-    text-transform: uppercase; letter-spacing: 0.5px;
-  }
-
-  .badge-active { background: var(--success-dim); color: var(--success); }
-  .badge-expiring { background: var(--accent-dim); color: var(--accent); }
-  .badge-expired { background: var(--danger-dim); color: var(--danger); }
-  .badge-extended { background: var(--extend-dim); color: var(--extend); }
-
-  .btn {
-    padding: 7px 14px; border-radius: 7px;
-    font-size: 12px; font-weight: 600;
-    font-family: 'Outfit', sans-serif;
-    cursor: pointer; border: none;
-    transition: all 0.2s;
-    display: inline-flex; align-items: center; gap: 6px;
-  }
-
-  .btn-danger { background: var(--danger-dim); color: var(--danger); }
-  .btn-danger:hover { background: var(--danger); color: #fff; }
-
-  .btn-accent { background: var(--accent-dim); color: var(--accent); }
-  .btn-accent:hover { background: var(--accent); color: #000; }
-
-  .btn-extend { background: var(--extend-dim); color: var(--extend); }
-  .btn-extend:hover { background: var(--extend); color: #fff; }
-
-  .btn-ghost { background: transparent; color: var(--text-secondary); border: 1px solid var(--border); }
-  .btn-ghost:hover { background: var(--bg-card-hover); color: var(--text-primary); }
-
-  .btn-success { background: var(--success-dim); color: var(--success); }
-  .btn-success:hover { background: var(--success); color: #fff; }
-
-  .toast-container {
-    position: fixed; top: 20px; right: 20px;
-    z-index: 9999; display: flex; flex-direction: column; gap: 8px;
-  }
-
-  .toast {
-    background: var(--bg-card); border: 1px solid var(--border);
-    border-radius: 10px; padding: 14px 18px;
-    display: flex; align-items: center; gap: 10px;
-    font-size: 13px; min-width: 280px; max-width: 420px;
-    animation: toast-in 0.4s cubic-bezier(0.16,1,0.3,1);
-    box-shadow: 0 8px 30px rgba(0,0,0,0.4);
-  }
-
-  .toast.removing { animation: toast-out 0.3s ease forwards; }
-  .toast i { font-size: 16px; flex-shrink: 0; }
-  .toast-success i { color: var(--success); }
-  .toast-danger i { color: var(--danger); }
-  .toast-info i { color: var(--info); }
-  .toast-extend i { color: var(--extend); }
-
-  @keyframes toast-in { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
-  @keyframes toast-out { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(40px); } }
-
-  .empty-state {
-    text-align: center; padding: 60px 20px; color: var(--text-muted);
-  }
-
-  .empty-state i { font-size: 48px; margin-bottom: 16px; display: block; }
-  .empty-state p { font-size: 14px; }
-
-  .avatar {
-    width: 36px; height: 36px;
-    border-radius: 8px; overflow: hidden;
-    background: var(--accent-dim);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 14px; font-weight: 700; color: var(--accent);
-    flex-shrink: 0;
-  }
-
-  .user-cell { display: flex; align-items: center; gap: 10px; }
-
-  .vehicle-thumb {
-    width: 60px; height: 40px;
-    border-radius: 6px; overflow: hidden;
-    background: var(--bg-main);
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-  }
-
-  .vehicle-thumb img { width: 100%; height: 100%; object-fit: cover; }
-  .vehicle-thumb i { color: var(--text-muted); font-size: 16px; }
-  .vehicle-cell { display: flex; align-items: center; gap: 10px; }
-
-  .modal-overlay {
-    position: fixed; inset: 0; z-index: 9000;
-    background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
-    display: flex; align-items: center; justify-content: center;
-    animation: fade-in 0.2s ease;
-  }
-
-  .modal-box {
-    background: var(--bg-card); border: 1px solid var(--border);
-    border-radius: 14px; padding: 28px; width: 440px; max-width: 90vw;
-    animation: scale-in 0.3s cubic-bezier(0.16,1,0.3,1);
-  }
-
-  .modal-box h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
-  .modal-box p { font-size: 14px; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.5; }
-  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
-
-  @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
-  @keyframes scale-in { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+  .modal-overlay { position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;animation:fade-in 0.2s ease; }
+  .modal-box { background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:28px;width:440px;max-width:90vw;animation:scale-in 0.3s cubic-bezier(0.16,1,0.3,1); }
+  .modal-box h3 { font-size:18px;font-weight:700;margin-bottom:8px; }
+  .modal-box p { font-size:14px;color:var(--text-secondary);margin-bottom:24px;line-height:1.5; }
+  .modal-actions { display:flex;gap:10px;justify-content:flex-end; }
 
   .bg-grid {
-    position: fixed; inset: 0; z-index: -1; pointer-events: none;
+    position:fixed;inset:0;z-index:-1;pointer-events:none;
     background-image:
-      radial-gradient(circle at 20% 50%, rgba(245,158,11,0.03) 0%, transparent 50%),
-      radial-gradient(circle at 80% 20%, rgba(168,85,247,0.03) 0%, transparent 50%),
-      linear-gradient(rgba(255,255,255,0.01) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,0.01) 1px, transparent 1px);
-    background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+      radial-gradient(circle at 20% 50%,rgba(245,158,11,0.03) 0%,transparent 50%),
+      radial-gradient(circle at 80% 20%,rgba(168,85,247,0.03) 0%,transparent 50%),
+      linear-gradient(rgba(255,255,255,0.01) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(255,255,255,0.01) 1px,transparent 1px);
+    background-size:100% 100%,100% 100%,40px 40px,40px 40px;
   }
+  .section-page { display:none; }
+  .section-page.active { display:block; }
 
-  .section-page { display: none; }
-  .section-page.active { display: block; }
+  /* Extend panel */
+  .extend-panel { background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:24px;position:relative;overflow:hidden; }
+  .extend-panel::before { content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--extend),var(--accent)); }
+  .extend-panel h3 { font-size:18px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:10px; }
+  .extend-panel h3 i { color:var(--extend); }
+  .extend-panel .desc { font-size:13px;color:var(--text-secondary);margin-bottom:20px; }
+  .extend-search-row { display:flex;gap:10px;align-items:stretch; }
+  .extend-input { flex:1;background:var(--bg-main);border:1px solid var(--border);border-radius:8px;padding:12px 16px;color:var(--text-primary);font-size:14px;font-family:'Outfit',sans-serif;outline:none;transition:border-color 0.2s; }
+  .extend-input:focus { border-color:var(--extend); }
+  .extend-input::placeholder { color:var(--text-muted); }
+  .extend-btn { padding:12px 24px;border-radius:8px;font-size:14px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer;border:none;background:var(--extend);color:#fff;transition:all 0.2s;display:flex;align-items:center;gap:8px;white-space:nowrap; }
+  .extend-btn:hover { filter:brightness(1.15);transform:translateY(-1px); }
+  .extend-results { margin-top:20px;border-top:1px solid var(--border);padding-top:20px; }
+  .extend-results-header { display:flex;align-items:center;justify-content:space-between;margin-bottom:12px; }
+  .extend-results-header h4 { font-size:14px;font-weight:600; }
+  .extend-vehicle-card { background:var(--bg-main);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:10px;display:flex;align-items:center;gap:16px;transition:all 0.2s; }
+  .extend-vehicle-card:hover { border-color:var(--border-light); }
+  .extend-vehicle-card .ev-info { flex:1; }
+  .extend-vehicle-card .ev-name { font-weight:600;font-size:15px;margin-bottom:2px; }
+  .extend-vehicle-card .ev-meta { font-size:12px;color:var(--text-muted); }
+  .extend-vehicle-card .ev-countdown { font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;margin-top:4px; }
+  .extend-vehicle-card .ev-status { margin-top:6px; }
+  .extend-vehicle-card .ev-actions { display:flex;flex-direction:column;gap:6px;align-items:flex-end; }
+  .extend-all-btn { padding:8px 18px;border-radius:7px;font-size:12px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer;border:none;background:var(--extend);color:#fff;transition:all 0.2s;display:inline-flex;align-items:center;gap:6px; }
+  .extend-all-btn:hover { filter:brightness(1.15); }
 
-  .price {
-    font-family: 'JetBrains Mono', monospace;
-    font-weight: 600; color: var(--success);
+  /* User info bar */
+  .user-bar {
+    display:flex;align-items:center;gap:10px;
+    padding:8px 16px;
+    background:var(--bg-card);
+    border:1px solid var(--border);
+    border-radius:8px;
+    font-size:12px;color:var(--text-secondary);
+    margin-bottom:16px;
   }
-
-  .auto-delete-label {
-    font-size: 10px; color: var(--text-muted);
-    margin-top: 2px;
+  .user-bar .user-email { color:var(--accent);font-weight:600; }
+  .logout-btn {
+    margin-left:auto;
+    padding:4px 10px;border-radius:5px;font-size:11px;font-weight:600;
+    font-family:'Outfit',sans-serif;cursor:pointer;border:none;
+    background:var(--danger-dim);color:var(--danger);transition:all 0.2s;
+    display:flex;align-items:center;gap:4px;
   }
+  .logout-btn:hover { background:var(--danger);color:#fff; }
 
-  /* Extend search panel */
-  .extend-panel {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 24px;
-    margin-bottom: 24px;
-    position: relative;
-    overflow: hidden;
+  @media (max-width:900px) {
+    .admin-layout { grid-template-columns:1fr; }
+    .sidebar { position:fixed;left:-260px;z-index:100;transition:left 0.3s ease;box-shadow:4px 0 30px rgba(0,0,0,0.5); }
+    .sidebar.open { left:0; }
+    .mobile-toggle { display:flex!important; }
+    .main-content { padding:20px; }
+    .extend-search-row { flex-direction:column; }
   }
-
-  .extend-panel::before {
-    content: '';
-    position: absolute; top: 0; left: 0; right: 0; height: 3px;
-    background: linear-gradient(90deg, var(--extend), var(--accent));
-  }
-
-  .extend-panel h3 {
-    font-size: 18px; font-weight: 700; margin-bottom: 4px;
-    display: flex; align-items: center; gap: 10px;
-  }
-
-  .extend-panel h3 i { color: var(--extend); }
-
-  .extend-panel .desc {
-    font-size: 13px; color: var(--text-secondary); margin-bottom: 20px;
-  }
-
-  .extend-search-row {
-    display: flex; gap: 10px; align-items: stretch;
-  }
-
-  .extend-input {
-    flex: 1;
-    background: var(--bg-main); border: 1px solid var(--border);
-    border-radius: 8px; padding: 12px 16px;
-    color: var(--text-primary); font-size: 14px;
-    font-family: 'Outfit', sans-serif;
-    outline: none; transition: border-color 0.2s;
-  }
-
-  .extend-input:focus { border-color: var(--extend); }
-
-  .extend-input::placeholder { color: var(--text-muted); }
-
-  .extend-btn {
-    padding: 12px 24px; border-radius: 8px;
-    font-size: 14px; font-weight: 700;
-    font-family: 'Outfit', sans-serif;
-    cursor: pointer; border: none;
-    background: var(--extend); color: #fff;
-    transition: all 0.2s;
-    display: flex; align-items: center; gap: 8px;
-    white-space: nowrap;
-  }
-
-  .extend-btn:hover { filter: brightness(1.15); transform: translateY(-1px); }
-
-  .extend-results {
-    margin-top: 20px;
-    border-top: 1px solid var(--border);
-    padding-top: 20px;
-  }
-
-  .extend-results-header {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 12px;
-  }
-
-  .extend-results-header h4 { font-size: 14px; font-weight: 600; }
-
-  .extend-vehicle-card {
-    background: var(--bg-main);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 16px;
-    margin-bottom: 10px;
-    display: flex; align-items: center; gap: 16px;
-    transition: all 0.2s;
-  }
-
-  .extend-vehicle-card:hover { border-color: var(--border-light); }
-
-  .extend-vehicle-card .ev-info { flex: 1; }
-  .extend-vehicle-card .ev-name { font-weight: 600; font-size: 15px; margin-bottom: 2px; }
-  .extend-vehicle-card .ev-meta { font-size: 12px; color: var(--text-muted); }
-  .extend-vehicle-card .ev-countdown {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 13px; font-weight: 600;
-    margin-top: 4px;
-  }
-
-  .extend-vehicle-card .ev-status { margin-top: 6px; }
-
-  .extend-vehicle-card .ev-actions {
-    display: flex; flex-direction: column; gap: 6px; align-items: flex-end;
-  }
-
-  .extend-all-btn {
-    padding: 8px 18px; border-radius: 7px;
-    font-size: 12px; font-weight: 700;
-    font-family: 'Outfit', sans-serif;
-    cursor: pointer; border: none;
-    background: var(--extend); color: #fff;
-    transition: all 0.2s;
-    display: inline-flex; align-items: center; gap: 6px;
-  }
-
-  .extend-all-btn:hover { filter: brightness(1.15); }
-
-  .extend-info-tag {
-    display: inline-flex; align-items: center; gap: 4px;
-    padding: 2px 8px; border-radius: 4px;
-    font-size: 10px; font-weight: 600;
-    background: var(--extend-dim); color: var(--extend);
-    text-transform: uppercase; letter-spacing: 0.5px;
-  }
-
-  /* Responsive */
-  @media (max-width: 900px) {
-    .admin-layout { grid-template-columns: 1fr; }
-    .sidebar {
-      position: fixed; left: -260px; z-index: 100;
-      transition: left 0.3s ease;
-      box-shadow: 4px 0 30px rgba(0,0,0,0.5);
-    }
-    .sidebar.open { left: 0; }
-    .mobile-toggle { display: flex !important; }
-    .main-content { padding: 20px; }
-    .extend-search-row { flex-direction: column; }
-  }
-
-  .mobile-toggle {
-    display: none;
-    align-items: center; justify-content: center;
-    width: 40px; height: 40px; border-radius: 8px;
-    background: var(--bg-card); border: 1px solid var(--border);
-    color: var(--text-primary); cursor: pointer;
-    font-size: 18px; margin-bottom: 16px;
-  }
-
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .fa-spin { animation: spin 1s linear infinite; }
+  .mobile-toggle { display:none;align-items:center;justify-content:center;width:40px;height:40px;border-radius:8px;background:var(--bg-card);border:1px solid var(--border);color:var(--text-primary);cursor:pointer;font-size:18px;margin-bottom:16px; }
+  @keyframes spin { to{transform:rotate(360deg)} }
+  .fa-spin { animation:spin 1s linear infinite; }
 </style>
 </head>
 <body>
@@ -526,6 +313,38 @@
 <div class="bg-grid"></div>
 <div class="toast-container" id="toastContainer"></div>
 
+<!-- ========== LOGIN SCREEN ========== -->
+<div id="loginScreen" class="login-screen">
+  <div class="login-box">
+    <div class="logo-row">
+      <div class="logo-icon"><i class="fas fa-car"></i></div>
+      <h1>Car Mart Admin</h1>
+    </div>
+    <div class="sub">Sign in to access the admin panel</div>
+
+    <div class="login-field">
+      <label>Email</label>
+      <input type="email" id="loginEmail" placeholder="admin@carmart.com" autocomplete="email">
+    </div>
+    <div class="login-field">
+      <label>Password</label>
+      <input type="password" id="loginPassword" placeholder="Enter password" autocomplete="current-password"
+        onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+
+    <button class="login-btn" id="loginBtn" onclick="doLogin()">
+      <i class="fas fa-right-to-bracket"></i> Sign In
+    </button>
+
+    <div class="login-error" id="loginError">
+      <i class="fas fa-exclamation-circle"></i>
+      <span id="loginErrorMsg"></span>
+    </div>
+  </div>
+</div>
+
+<!-- ========== ADMIN PANEL (hidden until login) ========== -->
+<div id="adminPanel" style="display:none;">
 <div class="admin-layout">
 
   <!-- Sidebar -->
@@ -537,251 +356,120 @@
         <div class="sub">Admin Panel</div>
       </div>
     </div>
-
     <div class="nav-section">
       <div class="nav-label">Overview</div>
-      <div class="nav-item active" data-page="dashboard" onclick="switchPage('dashboard')">
-        <i class="fas fa-chart-pie"></i> Dashboard
-      </div>
+      <div class="nav-item active" data-page="dashboard" onclick="switchPage('dashboard')"><i class="fas fa-chart-pie"></i> Dashboard</div>
     </div>
-
     <div class="nav-section">
       <div class="nav-label">Manage</div>
-      <div class="nav-item" data-page="vehicles" onclick="switchPage('vehicles')">
-        <i class="fas fa-car-side"></i> Vehicles
-        <span class="nav-badge" id="vehicleBadge">0</span>
-      </div>
-      <div class="nav-item" data-page="extend" onclick="switchPage('extend')">
-        <i class="fas fa-clock-rotate-left"></i> Extend Ads
-      </div>
-      <div class="nav-item" data-page="users" onclick="switchPage('users')">
-        <i class="fas fa-users"></i> Users
-        <span class="nav-badge" id="userBadge">0</span>
-      </div>
-      <div class="nav-item" data-page="cart" onclick="switchPage('cart')">
-        <i class="fas fa-shopping-cart"></i> My Cart
-        <span class="nav-badge" id="cartBadge">0</span>
-      </div>
+      <div class="nav-item" data-page="vehicles" onclick="switchPage('vehicles')"><i class="fas fa-car-side"></i> Vehicles<span class="nav-badge" id="vehicleBadge">0</span></div>
+      <div class="nav-item" data-page="extend" onclick="switchPage('extend')"><i class="fas fa-clock-rotate-left"></i> Extend Ads</div>
+      <div class="nav-item" data-page="users" onclick="switchPage('users')"><i class="fas fa-users"></i> Users<span class="nav-badge" id="userBadge">0</span></div>
+      <div class="nav-item" data-page="cart" onclick="switchPage('cart')"><i class="fas fa-shopping-cart"></i> My Cart<span class="nav-badge" id="cartBadge">0</span></div>
     </div>
-
     <div class="nav-section">
       <div class="nav-label">System</div>
-      <div class="nav-item" data-page="settings" onclick="switchPage('settings')">
-        <i class="fas fa-cog"></i> Settings
-      </div>
+      <div class="nav-item" data-page="settings" onclick="switchPage('settings')"><i class="fas fa-cog"></i> Settings</div>
     </div>
-
     <div class="sidebar-footer">
       <span class="status-dot"></span>
-      <span style="font-size:12px; color:var(--text-secondary);">Live &mdash; Auto-delete active</span>
+      <span style="font-size:12px;color:var(--text-secondary);">Live &mdash; Auto-delete active</span>
     </div>
   </aside>
 
   <!-- Main -->
   <main class="main-content">
+    <button class="mobile-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')"><i class="fas fa-bars"></i></button>
 
-    <button class="mobile-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">
-      <i class="fas fa-bars"></i>
-    </button>
+    <div class="user-bar" id="userBar">
+      <i class="fas fa-shield-halved" style="color:var(--success);"></i>
+      Signed in as <span class="user-email" id="userBarEmail">—</span>
+      <button class="logout-btn" onclick="doLogout()"><i class="fas fa-right-from-bracket"></i> Sign Out</button>
+    </div>
 
     <!-- DASHBOARD -->
     <div class="section-page active" id="page-dashboard">
-      <div class="page-header">
-        <h2>Dashboard</h2>
-        <p>Real-time overview of your Car Mart marketplace</p>
-      </div>
-
+      <div class="page-header"><h2>Dashboard</h2><p>Real-time overview of your Car Mart marketplace</p></div>
       <div class="stats-row">
-        <div class="stat-card">
-          <div class="stat-icon" style="background:var(--accent-dim); color:var(--accent);"><i class="fas fa-car-side"></i></div>
-          <div class="stat-value" id="statVehicles">—</div>
-          <div class="stat-label">Active Vehicles</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon" style="background:var(--info-dim); color:var(--info);"><i class="fas fa-users"></i></div>
-          <div class="stat-value" id="statUsers">—</div>
-          <div class="stat-label">Registered Users</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon" style="background:var(--success-dim); color:var(--success);"><i class="fas fa-shopping-cart"></i></div>
-          <div class="stat-value" id="statCart">—</div>
-          <div class="stat-label">Cart Items</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon" style="background:var(--danger-dim); color:var(--danger);"><i class="fas fa-clock"></i></div>
-          <div class="stat-value" id="statExpiring">—</div>
-          <div class="stat-label">Expiring Soon</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon" style="background:var(--extend-dim); color:var(--extend);"><i class="fas fa-arrows-rotate"></i></div>
-          <div class="stat-value" id="statExtended">—</div>
-          <div class="stat-label">Extended Ads</div>
-        </div>
+        <div class="stat-card"><div class="stat-icon" style="background:var(--accent-dim);color:var(--accent);"><i class="fas fa-car-side"></i></div><div class="stat-value" id="statVehicles">—</div><div class="stat-label">Active Vehicles</div></div>
+        <div class="stat-card"><div class="stat-icon" style="background:var(--info-dim);color:var(--info);"><i class="fas fa-users"></i></div><div class="stat-value" id="statUsers">—</div><div class="stat-label">Registered Users</div></div>
+        <div class="stat-card"><div class="stat-icon" style="background:var(--success-dim);color:var(--success);"><i class="fas fa-shopping-cart"></i></div><div class="stat-value" id="statCart">—</div><div class="stat-label">Cart Items</div></div>
+        <div class="stat-card"><div class="stat-icon" style="background:var(--danger-dim);color:var(--danger);"><i class="fas fa-clock"></i></div><div class="stat-value" id="statExpiring">—</div><div class="stat-label">Expiring Soon</div></div>
+        <div class="stat-card"><div class="stat-icon" style="background:var(--extend-dim);color:var(--extend);"><i class="fas fa-arrows-rotate"></i></div><div class="stat-value" id="statExtended">—</div><div class="stat-label">Extended Ads</div></div>
       </div>
-
       <div class="data-table-wrap">
-        <div class="table-header">
-          <h3>Recent Vehicle Ads</h3>
-          <button class="btn btn-ghost" onclick="switchPage('vehicles')"><i class="fas fa-arrow-right"></i> View All</button>
-        </div>
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Vehicle</th>
-              <th>Price</th>
-              <th>Status</th>
-              <th>Expires In</th>
-            </tr>
-          </thead>
-          <tbody id="dashVehicleBody">
-            <tr><td colspan="4"><div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Loading...</p></div></td></tr>
-          </tbody>
-        </table>
+        <div class="table-header"><h3>Recent Vehicle Ads</h3><button class="btn btn-ghost" onclick="switchPage('vehicles')"><i class="fas fa-arrow-right"></i> View All</button></div>
+        <table class="data-table"><thead><tr><th>Vehicle</th><th>Price</th><th>Status</th><th>Expires In</th></tr></thead>
+        <tbody id="dashVehicleBody"><tr><td colspan="4"><div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Loading...</p></div></td></tr></tbody></table>
       </div>
     </div>
 
     <!-- VEHICLES -->
     <div class="section-page" id="page-vehicles">
-      <div class="page-header">
-        <h2>Vehicles</h2>
-        <p>All vehicle listings with auto-delete countdown</p>
-      </div>
-
+      <div class="page-header"><h2>Vehicles</h2><p>All vehicle listings with auto-delete countdown</p></div>
       <div class="data-table-wrap">
-        <div class="table-header">
-          <h3>All Vehicles <span style="color:var(--text-muted); font-weight:400; font-size:13px; margin-left:8px;" id="vehicleCount"></span></h3>
-          <input type="text" class="search-box" placeholder="Search vehicles..." id="vehicleSearch" oninput="renderVehicles()">
-        </div>
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Vehicle</th>
-              <th>Price</th>
-              <th>Added</th>
-              <th>Status</th>
-              <th>Countdown</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="vehicleBody">
-            <tr><td colspan="6"><div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Loading...</p></div></td></tr>
-          </tbody>
-        </table>
+        <div class="table-header"><h3>All Vehicles <span style="color:var(--text-muted);font-weight:400;font-size:13px;margin-left:8px;" id="vehicleCount"></span></h3><input type="text" class="search-box" placeholder="Search vehicles..." id="vehicleSearch" oninput="renderVehicles()"></div>
+        <table class="data-table"><thead><tr><th>Vehicle</th><th>Price</th><th>Added</th><th>Status</th><th>Countdown</th><th>Actions</th></tr></thead>
+        <tbody id="vehicleBody"><tr><td colspan="6"><div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Loading...</p></div></td></tr></tbody></table>
       </div>
     </div>
 
-    <!-- EXTEND ADS PAGE -->
+    <!-- EXTEND -->
     <div class="section-page" id="page-extend">
-      <div class="page-header">
-        <h2>Extend Ads</h2>
-        <p>Find vehicle ads by email and extend their lifetime to 30 days</p>
-      </div>
-
+      <div class="page-header"><h2>Extend Ads</h2><p>Find vehicle ads by email and extend their lifetime to 30 days</p></div>
       <div class="extend-panel">
         <h3><i class="fas fa-clock-rotate-left"></i> Extend by Email</h3>
         <div class="desc">Enter the seller's email address to find their vehicle ads. You can then extend any ad from the default 15-day period to 30 days from now.</div>
-
         <div class="extend-search-row">
           <input type="email" class="extend-input" id="extendEmailInput" placeholder="seller@example.com" onkeydown="if(event.key==='Enter')searchByEmail()">
-          <button class="extend-btn" onclick="searchByEmail()" id="extendSearchBtn">
-            <i class="fas fa-search"></i> Search
-          </button>
+          <button class="extend-btn" onclick="searchByEmail()"><i class="fas fa-search"></i> Search</button>
         </div>
-
         <div id="extendResults"></div>
       </div>
     </div>
 
     <!-- USERS -->
     <div class="section-page" id="page-users">
-      <div class="page-header">
-        <h2>Users</h2>
-        <p>Registered user accounts on Car Mart</p>
-      </div>
-
+      <div class="page-header"><h2>Users</h2><p>Registered user accounts on Car Mart</p></div>
       <div class="data-table-wrap">
-        <div class="table-header">
-          <h3>All Users <span style="color:var(--text-muted); font-weight:400; font-size:13px; margin-left:8px;" id="userCount"></span></h3>
-          <input type="text" class="search-box" placeholder="Search users..." id="userSearch" oninput="renderUsers()">
-        </div>
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>User</th>
-              <th>Email</th>
-              <th>Joined</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="userBody">
-            <tr><td colspan="4"><div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Loading...</p></div></td></tr>
-          </tbody>
-        </table>
+        <div class="table-header"><h3>All Users <span style="color:var(--text-muted);font-weight:400;font-size:13px;margin-left:8px;" id="userCount"></span></h3><input type="text" class="search-box" placeholder="Search users..." id="userSearch" oninput="renderUsers()"></div>
+        <table class="data-table"><thead><tr><th>User</th><th>Email</th><th>Joined</th><th>Actions</th></tr></thead>
+        <tbody id="userBody"><tr><td colspan="4"><div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Loading...</p></div></td></tr></tbody></table>
       </div>
     </div>
 
     <!-- CART -->
     <div class="section-page" id="page-cart">
-      <div class="page-header">
-        <h2>My Cart</h2>
-        <p>Items currently in users' shopping carts</p>
-      </div>
-
+      <div class="page-header"><h2>My Cart</h2><p>Items currently in users' shopping carts</p></div>
       <div class="data-table-wrap">
-        <div class="table-header">
-          <h3>Cart Items <span style="color:var(--text-muted); font-weight:400; font-size:13px; margin-left:8px;" id="cartCount"></span></h3>
-        </div>
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Item</th>
-              <th>User</th>
-              <th>Price</th>
-              <th>Added</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="cartBody">
-            <tr><td colspan="5"><div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Loading...</p></div></td></tr>
-          </tbody>
-        </table>
+        <div class="table-header"><h3>Cart Items <span style="color:var(--text-muted);font-weight:400;font-size:13px;margin-left:8px;" id="cartCount"></span></h3></div>
+        <table class="data-table"><thead><tr><th>Item</th><th>User</th><th>Price</th><th>Added</th><th>Actions</th></tr></thead>
+        <tbody id="cartBody"><tr><td colspan="5"><div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Loading...</p></div></td></tr></tbody></table>
       </div>
     </div>
 
     <!-- SETTINGS -->
     <div class="section-page" id="page-settings">
-      <div class="page-header">
-        <h2>Settings</h2>
-        <p>Admin panel configuration</p>
-      </div>
-
+      <div class="page-header"><h2>Settings</h2><p>Admin panel configuration</p></div>
       <div class="data-table-wrap" style="padding:24px;">
-        <div style="display:grid; gap:20px; max-width:500px;">
+        <div style="display:grid;gap:20px;max-width:500px;">
           <div>
-            <label style="font-size:13px; font-weight:600; display:block; margin-bottom:6px;">Default Auto-Delete Period (days)</label>
-            <input type="number" id="deleteDays" value="15" min="1" max="365"
-              style="background:var(--bg-main); border:1px solid var(--border); border-radius:8px; padding:10px 14px; color:var(--text-primary); font-family:'JetBrains Mono',monospace; font-size:14px; width:120px; outline:none;"
-              onchange="UPDATE_DELETE_PERIOD(parseInt(this.value)||15)">
-            <p style="font-size:11px; color:var(--text-muted); margin-top:4px;">Vehicle ads are automatically removed after this many days</p>
+            <label style="font-size:13px;font-weight:600;display:block;margin-bottom:6px;">Default Auto-Delete Period (days)</label>
+            <input type="number" id="deleteDays" value="15" min="1" max="365" style="background:var(--bg-main);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-family:'JetBrains Mono',monospace;font-size:14px;width:120px;outline:none;" onchange="DELETE_PERIOD_DAYS=Math.max(1,Math.min(365,parseInt(this.value)||15));showToast('Auto-delete set to '+DELETE_PERIOD_DAYS+' days','info');renderVehicles();renderDashboardVehicles();">
+            <p style="font-size:11px;color:var(--text-muted);margin-top:4px;">Vehicle ads are automatically removed after this many days</p>
           </div>
           <div>
-            <label style="font-size:13px; font-weight:600; display:block; margin-bottom:6px;">Extended Period (days)</label>
-            <input type="number" id="extendDays" value="30" min="1" max="365"
-              style="background:var(--bg-main); border:1px solid var(--border); border-radius:8px; padding:10px 14px; color:var(--text-primary); font-family:'JetBrains Mono',monospace; font-size:14px; width:120px; outline:none;"
-              onchange="EXTEND_PERIOD_DAYS=Math.max(1,Math.min(365,parseInt(this.value)||30)); showToast('Extended period set to '+EXTEND_PERIOD_DAYS+' days','info');">
-            <p style="font-size:11px; color:var(--text-muted); margin-top:4px;">When you extend an ad, it will last this many days from the extension moment</p>
+            <label style="font-size:13px;font-weight:600;display:block;margin-bottom:6px;">Extended Period (days)</label>
+            <input type="number" id="extendDays" value="30" min="1" max="365" style="background:var(--bg-main);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-family:'JetBrains Mono',monospace;font-size:14px;width:120px;outline:none;" onchange="EXTEND_PERIOD_DAYS=Math.max(1,Math.min(365,parseInt(this.value)||30));showToast('Extended period set to '+EXTEND_PERIOD_DAYS+' days','info');">
+            <p style="font-size:11px;color:var(--text-muted);margin-top:4px;">When you extend an ad, it will last this many days from the extension moment</p>
           </div>
-          <div style="padding-top:12px; border-top:1px solid var(--border);">
-            <label style="font-size:13px; font-weight:600; display:block; margin-bottom:6px;">Firebase Connection</label>
-            <div style="display:flex; align-items:center; gap:8px;">
-              <span class="status-dot" style="display:inline-block;"></span>
-              <span style="font-size:13px; color:var(--success);">Connected to car-mart01</span>
-            </div>
+          <div style="padding-top:12px;border-top:1px solid var(--border);">
+            <label style="font-size:13px;font-weight:600;display:block;margin-bottom:6px;">Firebase Connection</label>
+            <div style="display:flex;align-items:center;gap:8px;"><span class="status-dot" style="display:inline-block;"></span><span style="font-size:13px;color:var(--success);">Connected &amp; Authenticated</span></div>
           </div>
-          <div style="padding-top:12px; border-top:1px solid var(--border);">
-            <label style="font-size:13px; font-weight:600; display:block; margin-bottom:6px;">Danger Zone</label>
+          <div style="padding-top:12px;border-top:1px solid var(--border);">
+            <label style="font-size:13px;font-weight:600;display:block;margin-bottom:6px;">Danger Zone</label>
             <button class="btn btn-danger" onclick="confirmPurge()"><i class="fas fa-trash"></i> Purge Expired Vehicles Now</button>
-            <p style="font-size:11px; color:var(--text-muted); margin-top:4px;">Manually trigger deletion of all expired vehicle ads</p>
           </div>
         </div>
       </div>
@@ -789,12 +477,13 @@
 
   </main>
 </div>
+</div>
 
 <div id="modalContainer"></div>
 
 <script>
   // ============================================
-  // Firebase
+  // Firebase Init
   // ============================================
   const firebaseConfig = {
     apiKey: "AIzaSyAEu-uW53mk9kaHh6Lh_qa8-M59yz_fseY",
@@ -806,9 +495,9 @@
     appId: "1:257242312778:web:5c3e8bff7429a5f5d2b6b3",
     measurementId: "G-MFT2YY8Y5Y"
   };
-
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
+  const auth = firebase.auth();
 
   // ============================================
   // State
@@ -820,33 +509,118 @@
   let EXTEND_PERIOD_DAYS = 30;
   let countdownInterval = null;
   let autoDeleteInterval = null;
+  let isAdmin = false;
+  let listenersAttached = false;
 
   // ============================================
   // Toast
   // ============================================
-  function showToast(message, type = 'info') {
-    const container = document.getElementById('toastContainer');
-    const icons = { success: 'fa-check-circle', danger: 'fa-exclamation-circle', info: 'fa-info-circle', extend: 'fa-clock-rotate-left' };
-    const toast = document.createElement('div');
-    toast.className = `toast toast-${type}`;
-    toast.innerHTML = `<i class="fas ${icons[type] || icons.info}"></i><span>${message}</span>`;
-    container.appendChild(toast);
-    setTimeout(() => {
-      toast.classList.add('removing');
-      setTimeout(() => toast.remove(), 300);
-    }, 3500);
+  function showToast(msg, type='info') {
+    const c = document.getElementById('toastContainer');
+    const icons = {success:'fa-check-circle',danger:'fa-exclamation-circle',info:'fa-info-circle',extend:'fa-clock-rotate-left'};
+    const t = document.createElement('div');
+    t.className = `toast toast-${type}`;
+    t.innerHTML = `<i class="fas ${icons[type]||icons.info}"></i><span>${msg}</span>`;
+    c.appendChild(t);
+    setTimeout(()=>{t.classList.add('removing');setTimeout(()=>t.remove(),300);},3500);
   }
+
+  // ============================================
+  // LOGIN / AUTH
+  // ============================================
+  function doLogin() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const pass = document.getElementById('loginPassword').value;
+    const btn = document.getElementById('loginBtn');
+    const errEl = document.getElementById('loginError');
+    const errMsg = document.getElementById('loginErrorMsg');
+
+    if (!email || !pass) {
+      errMsg.textContent = 'Please enter email and password';
+      errEl.classList.add('show');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
+    errEl.classList.remove('show');
+
+    auth.signInWithEmailAndPassword(email, pass)
+      .then(cred => {
+        // Check if this user is an admin
+        return db.ref('admins/' + cred.user.uid).once('value').then(snap => {
+          if (snap.exists()) {
+            isAdmin = true;
+            enterAdminPanel(cred.user);
+          } else {
+            // Not an admin — sign out
+            auth.signOut();
+            errMsg.textContent = 'This account does not have admin access. Your UID was not found in the admins node.';
+            errEl.classList.add('show');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-right-to-bracket"></i> Sign In';
+          }
+        });
+      })
+      .catch(err => {
+        const messages = {
+          'auth/user-not-found': 'No account found with this email',
+          'auth/wrong-password': 'Incorrect password',
+          'auth/invalid-email': 'Invalid email address',
+          'auth/too-many-requests': 'Too many failed attempts. Try again later.',
+          'auth/invalid-credential': 'Invalid email or password'
+        };
+        errMsg.textContent = messages[err.code] || err.message;
+        errEl.classList.add('show');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-right-to-bracket"></i> Sign In';
+      });
+  }
+
+  function doLogout() {
+    auth.signOut().then(() => {
+      // Clean up listeners
+      listenersAttached = false;
+      document.getElementById('adminPanel').style.display = 'none';
+      document.getElementById('loginScreen').style.display = 'flex';
+      showToast('Signed out', 'info');
+    });
+  }
+
+  function enterAdminPanel(user) {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('adminPanel').style.display = 'block';
+    document.getElementById('userBarEmail').textContent = user.email;
+    showToast('Welcome, admin!', 'success');
+    attachListeners();
+    startCountdownTick();
+    startAutoDeleteCheck();
+  }
+
+  // Auto-detect if already signed in (page refresh)
+  auth.onAuthStateChanged(user => {
+    if (user && !isAdmin) {
+      db.ref('admins/' + user.uid).once('value').then(snap => {
+        if (snap.exists()) {
+          isAdmin = true;
+          enterAdminPanel(user);
+        } else {
+          auth.signOut();
+        }
+      });
+    }
+  });
 
   // ============================================
   // Navigation
   // ============================================
   function switchPage(page) {
-    document.querySelectorAll('.section-page').forEach(el => el.classList.remove('active'));
-    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-    const pageEl = document.getElementById('page-' + page);
-    const navEl = document.querySelector(`.nav-item[data-page="${page}"]`);
-    if (pageEl) pageEl.classList.add('active');
-    if (navEl) navEl.classList.add('active');
+    document.querySelectorAll('.section-page').forEach(el=>el.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
+    const p = document.getElementById('page-'+page);
+    const n = document.querySelector(`.nav-item[data-page="${page}"]`);
+    if(p) p.classList.add('active');
+    if(n) n.classList.add('active');
     document.getElementById('sidebar').classList.remove('open');
   }
 
@@ -855,164 +629,62 @@
   // ============================================
   const MS_PER_DAY = 86400000;
 
-  // Get the expiry timestamp for a vehicle
-  // If it has been extended (expiresAt field), use that
-  // Otherwise, use addedAt + default period
   function getExpiryTs(v) {
-    if (v.expiresAt && typeof v.expiresAt === 'number') {
-      return v.expiresAt;
-    }
-    const addedAt = v.addedAt || v.timestamp || v.createdAt || 0;
-    if (!addedAt) return Date.now() + DELETE_PERIOD_DAYS * MS_PER_DAY;
-    const added = typeof addedAt === 'number' ? addedAt : new Date(addedAt).getTime();
-    return added + DELETE_PERIOD_DAYS * MS_PER_DAY;
+    if(v.expiresAt && typeof v.expiresAt==='number') return v.expiresAt;
+    const a = v.addedAt||v.timestamp||v.createdAt||0;
+    if(!a) return Date.now()+DELETE_PERIOD_DAYS*MS_PER_DAY;
+    return (typeof a==='number'?a:new Date(a).getTime())+DELETE_PERIOD_DAYS*MS_PER_DAY;
   }
-
-  function getRemainingMs(v) {
-    return getExpiryTs(v) - Date.now();
-  }
-
+  function getRemainingMs(v) { return getExpiryTs(v)-Date.now(); }
   function formatCountdown(ms) {
-    if (ms <= 0) return '00:00:00:00';
-    const days = Math.floor(ms / MS_PER_DAY);
-    const hrs = Math.floor((ms % MS_PER_DAY) / 3600000);
-    const mins = Math.floor((ms % 3600000) / 60000);
-    const secs = Math.floor((ms % 60000) / 1000);
-    return `${String(days).padStart(2,'0')}:${String(hrs).padStart(2,'0')}:${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+    if(ms<=0) return '00:00:00:00';
+    const d=Math.floor(ms/MS_PER_DAY), h=Math.floor((ms%MS_PER_DAY)/3600000), m=Math.floor((ms%3600000)/60000), s=Math.floor((ms%60000)/1000);
+    return `${String(d).padStart(2,'0')}:${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
   }
-
-  function getCountdownPercent(ms) {
-    const total = DELETE_PERIOD_DAYS * MS_PER_DAY;
-    return Math.max(0, Math.min(100, (ms / total) * 100));
+  function getCountdownPercent(ms) { return Math.max(0,Math.min(100,(ms/(DELETE_PERIOD_DAYS*MS_PER_DAY))*100)); }
+  function getStatus(ms) { const d=ms/MS_PER_DAY; if(d<=0) return 'expired'; if(d<=3) return 'expiring'; return 'active'; }
+  function isVehicleExtended(v) { return !!v.expiresAt; }
+  function getStatusBadge(status, ext) {
+    if(ext) return '<span class="badge badge-extended"><i class="fas fa-arrows-rotate" style="font-size:8px"></i> Extended</span>';
+    const m={active:'<span class="badge badge-active"><i class="fas fa-circle" style="font-size:6px"></i> Active</span>',expiring:'<span class="badge badge-expiring"><i class="fas fa-circle" style="font-size:6px"></i> Expiring</span>',expired:'<span class="badge badge-expired"><i class="fas fa-circle" style="font-size:6px"></i> Expired</span>'};
+    return m[status]||m.active;
   }
-
-  function getStatus(ms) {
-    const daysLeft = ms / MS_PER_DAY;
-    if (daysLeft <= 0) return 'expired';
-    if (daysLeft <= 3) return 'expiring';
-    return 'active';
-  }
-
-  function getStatusBadge(status, isExtended) {
-    if (isExtended) {
-      return '<span class="badge badge-extended"><i class="fas fa-arrows-rotate" style="font-size:8px"></i> Extended</span>';
-    }
-    const map = {
-      active: '<span class="badge badge-active"><i class="fas fa-circle" style="font-size:6px"></i> Active</span>',
-      expiring: '<span class="badge badge-expiring"><i class="fas fa-circle" style="font-size:6px"></i> Expiring</span>',
-      expired: '<span class="badge badge-expired"><i class="fas fa-circle" style="font-size:6px"></i> Expired</span>'
-    };
-    return map[status] || map.active;
-  }
-
-  function getCountdownColor(ms, isExtended) {
-    if (isExtended) {
-      const daysLeft = ms / MS_PER_DAY;
-      if (daysLeft <= 0) return 'var(--danger)';
-      if (daysLeft <= 5) return 'var(--extend)';
-      return 'var(--extend)';
-    }
-    const daysLeft = ms / MS_PER_DAY;
-    if (daysLeft <= 0) return 'var(--danger)';
-    if (daysLeft <= 3) return 'var(--accent)';
-    return 'var(--success)';
-  }
-
-  function isVehicleExtended(v) {
-    return !!v.expiresAt;
+  function getCountdownColor(ms, ext) {
+    if(ext){const d=ms/MS_PER_DAY; if(d<=0) return 'var(--danger)'; return 'var(--extend)';}
+    const d=ms/MS_PER_DAY; if(d<=0) return 'var(--danger)'; if(d<=3) return 'var(--accent)'; return 'var(--success)';
   }
 
   // ============================================
   // Render Helpers
   // ============================================
-  function getVehicleImage(vehicle) {
-    if (vehicle.imageUrl) return `<img src="${vehicle.imageUrl}" alt="" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-car\\'></i>'">`;
-    return '<i class="fas fa-car"></i>';
-  }
-
-  function getVehicleName(vehicle) {
-    return vehicle.name || vehicle.title || vehicle.vehicleName || `${vehicle.brand || ''} ${vehicle.model || ''}`.trim() || 'Unnamed Vehicle';
-  }
-
-  function getVehiclePrice(vehicle) {
-    const price = vehicle.price || vehicle.cost || 0;
-    return typeof price === 'number' ? 'Rs. ' + price.toLocaleString() : price || '—';
-  }
-
-  function getVehicleEmail(vehicle) {
-    return vehicle.email || vehicle.sellerEmail || vehicle.userEmail || vehicle.ownerEmail || '';
-  }
-
-  function formatDate(ts) {
-    if (!ts) return '—';
-    const d = new Date(typeof ts === 'number' ? ts : ts);
-    if (isNaN(d.getTime())) return '—';
-    return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-  }
-
-  function getUserInitial(name) {
-    return (name || 'U').charAt(0).toUpperCase();
-  }
+  function getVehicleImage(v) { if(v.imageUrl) return `<img src="${v.imageUrl}" alt="" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-car\\'></i>'">`; return '<i class="fas fa-car"></i>'; }
+  function getVehicleName(v) { return v.name||v.title||v.vehicleName||`${v.brand||''} ${v.model||''}`.trim()||'Unnamed Vehicle'; }
+  function getVehiclePrice(v) { const p=v.price||v.cost||0; return typeof p==='number'?'Rs. '+p.toLocaleString():p||'—'; }
+  function getVehicleEmail(v) { return v.email||v.sellerEmail||v.userEmail||v.ownerEmail||''; }
+  function formatDate(ts) { if(!ts) return '—'; const d=new Date(typeof ts==='number'?ts:ts); if(isNaN(d.getTime())) return '—'; return d.toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}); }
+  function getUserInitial(n) { return (n||'U').charAt(0).toUpperCase(); }
 
   // ============================================
   // Render: Vehicles
   // ============================================
   function renderVehicles() {
-    const search = (document.getElementById('vehicleSearch')?.value || '').toLowerCase();
-    const entries = Object.entries(vehiclesData).filter(([id, v]) => {
-      const name = getVehicleName(v).toLowerCase();
-      const email = getVehicleEmail(v).toLowerCase();
-      return name.includes(search) || email.includes(search);
-    });
-
-    document.getElementById('vehicleCount').textContent = `(${entries.length})`;
-    const tbody = document.getElementById('vehicleBody');
-
-    if (!entries.length) {
-      tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><i class="fas fa-car-side"></i><p>No vehicles found</p></div></td></tr>`;
-      return;
-    }
-
-    tbody.innerHTML = entries.map(([id, v]) => {
-      const name = getVehicleName(v);
-      const price = getVehiclePrice(v);
-      const addedAt = v.addedAt || v.timestamp || v.createdAt || 0;
-      const remaining = getRemainingMs(v);
-      const status = getStatus(remaining);
-      const extended = isVehicleExtended(v);
-      const pct = getCountdownPercent(remaining);
-      const color = getCountdownColor(remaining, extended);
-      const formatted = formatCountdown(remaining);
-      const periodLabel = extended ? `${EXTEND_PERIOD_DAYS}d extended` : `${DELETE_PERIOD_DAYS}d default`;
-
+    const s=(document.getElementById('vehicleSearch')?.value||'').toLowerCase();
+    const entries=Object.entries(vehiclesData).filter(([id,v])=>getVehicleName(v).toLowerCase().includes(s)||getVehicleEmail(v).toLowerCase().includes(s));
+    document.getElementById('vehicleCount').textContent=`(${entries.length})`;
+    const tbody=document.getElementById('vehicleBody');
+    if(!entries.length){tbody.innerHTML=`<tr><td colspan="6"><div class="empty-state"><i class="fas fa-car-side"></i><p>No vehicles found</p></div></td></tr>`;return;}
+    tbody.innerHTML=entries.map(([id,v])=>{
+      const name=getVehicleName(v),price=getVehiclePrice(v),addedAt=v.addedAt||v.timestamp||v.createdAt||0;
+      const remaining=getRemainingMs(v),status=getStatus(remaining),extended=isVehicleExtended(v);
+      const pct=getCountdownPercent(remaining),color=getCountdownColor(remaining,extended),formatted=formatCountdown(remaining);
+      const periodLabel=extended?`${EXTEND_PERIOD_DAYS}d extended`:`${DELETE_PERIOD_DAYS}d default`;
       return `<tr data-vehicle-id="${id}">
-        <td>
-          <div class="vehicle-cell">
-            <div class="vehicle-thumb">${getVehicleImage(v)}</div>
-            <div>
-              <div style="font-weight:600;">${name}</div>
-              <div style="font-size:11px; color:var(--text-muted);">${id}${getVehicleEmail(v) ? ' &middot; ' + getVehicleEmail(v) : ''}</div>
-            </div>
-          </div>
-        </td>
+        <td><div class="vehicle-cell"><div class="vehicle-thumb">${getVehicleImage(v)}</div><div><div style="font-weight:600;">${name}</div><div style="font-size:11px;color:var(--text-muted);">${id}${getVehicleEmail(v)?' &middot; '+getVehicleEmail(v):''}</div></div></div></td>
         <td><span class="price">${price}</span></td>
-        <td style="font-size:13px; color:var(--text-secondary);">${formatDate(addedAt)}</td>
-        <td>${getStatusBadge(status, extended)}</td>
-        <td>
-          <div class="countdown-cell">
-            <span class="countdown-text" style="color:${color};" data-countdown-id="${id}">${formatted}</span>
-            <div class="countdown-bar">
-              <div class="countdown-bar-fill" style="width:${pct}%; background:${color};" data-countdown-bar="${id}"></div>
-            </div>
-          </div>
-          <div class="auto-delete-label">${periodLabel}</div>
-        </td>
-        <td>
-          <div style="display:flex; gap:6px; flex-wrap:wrap;">
-            ${!extended ? `<button class="btn btn-extend" onclick="extendVehicle('${id}')"><i class="fas fa-arrows-rotate"></i> Extend</button>` : ''}
-            <button class="btn btn-danger" onclick="confirmDeleteVehicle('${id}','${name.replace(/'/g,"\\'")}')"><i class="fas fa-trash"></i></button>
-          </div>
-        </td>
+        <td style="font-size:13px;color:var(--text-secondary);">${formatDate(addedAt)}</td>
+        <td>${getStatusBadge(status,extended)}</td>
+        <td><div class="countdown-cell"><span class="countdown-text" style="color:${color};" data-countdown-id="${id}">${formatted}</span><div class="countdown-bar"><div class="countdown-bar-fill" style="width:${pct}%;background:${color};" data-countdown-bar="${id}"></div></div></div><div class="auto-delete-label">${periodLabel}</div></td>
+        <td><div style="display:flex;gap:6px;flex-wrap:wrap;">${!extended?`<button class="btn btn-extend" onclick="extendVehicle('${id}')"><i class="fas fa-arrows-rotate"></i> Extend</button>`:''}<button class="btn btn-danger" onclick="confirmDeleteVehicle('${id}','${name.replace(/'/g,"\\'")}')"><i class="fas fa-trash"></i></button></div></td>
       </tr>`;
     }).join('');
   }
@@ -1021,40 +693,12 @@
   // Render: Dashboard
   // ============================================
   function renderDashboardVehicles() {
-    const entries = Object.entries(vehiclesData)
-      .sort((a, b) => {
-        const tA = a[1].addedAt || a[1].timestamp || a[1].createdAt || 0;
-        const tB = b[1].addedAt || b[1].timestamp || b[1].createdAt || 0;
-        return tB - tA;
-      })
-      .slice(0, 5);
-
-    const tbody = document.getElementById('dashVehicleBody');
-    if (!entries.length) {
-      tbody.innerHTML = `<tr><td colspan="4"><div class="empty-state"><i class="fas fa-car-side"></i><p>No vehicles yet</p></div></td></tr>`;
-      return;
-    }
-
-    tbody.innerHTML = entries.map(([id, v]) => {
-      const name = getVehicleName(v);
-      const price = getVehiclePrice(v);
-      const remaining = getRemainingMs(v);
-      const status = getStatus(remaining);
-      const extended = isVehicleExtended(v);
-      const color = getCountdownColor(remaining, extended);
-      const formatted = formatCountdown(remaining);
-
-      return `<tr>
-        <td>
-          <div class="vehicle-cell">
-            <div class="vehicle-thumb">${getVehicleImage(v)}</div>
-            <span style="font-weight:600;">${name}</span>
-          </div>
-        </td>
-        <td><span class="price">${price}</span></td>
-        <td>${getStatusBadge(status, extended)}</td>
-        <td><span class="countdown-text" style="color:${color};" data-countdown-id="dash-${id}">${formatted}</span></td>
-      </tr>`;
+    const entries=Object.entries(vehiclesData).sort((a,b)=>((b[1].addedAt||b[1].timestamp||b[1].createdAt||0)-(a[1].addedAt||a[1].timestamp||a[1].createdAt||0))).slice(0,5);
+    const tbody=document.getElementById('dashVehicleBody');
+    if(!entries.length){tbody.innerHTML=`<tr><td colspan="4"><div class="empty-state"><i class="fas fa-car-side"></i><p>No vehicles yet</p></div></td></tr>`;return;}
+    tbody.innerHTML=entries.map(([id,v])=>{
+      const name=getVehicleName(v),price=getVehiclePrice(v),remaining=getRemainingMs(v),status=getStatus(remaining),extended=isVehicleExtended(v),color=getCountdownColor(remaining,extended),formatted=formatCountdown(remaining);
+      return `<tr><td><div class="vehicle-cell"><div class="vehicle-thumb">${getVehicleImage(v)}</div><span style="font-weight:600;">${name}</span></div></td><td><span class="price">${price}</span></td><td>${getStatusBadge(status,extended)}</td><td><span class="countdown-text" style="color:${color};" data-countdown-id="dash-${id}">${formatted}</span></td></tr>`;
     }).join('');
   }
 
@@ -1062,42 +706,14 @@
   // Render: Users
   // ============================================
   function renderUsers() {
-    const search = (document.getElementById('userSearch')?.value || '').toLowerCase();
-    const entries = Object.entries(usersData).filter(([id, u]) => {
-      const name = (u.name || u.displayName || u.username || '').toLowerCase();
-      const email = (u.email || '').toLowerCase();
-      return name.includes(search) || email.includes(search) || id.toLowerCase().includes(search);
-    });
-
-    document.getElementById('userCount').textContent = `(${entries.length})`;
-    const tbody = document.getElementById('userBody');
-
-    if (!entries.length) {
-      tbody.innerHTML = `<tr><td colspan="4"><div class="empty-state"><i class="fas fa-users"></i><p>No users found</p></div></td></tr>`;
-      return;
-    }
-
-    tbody.innerHTML = entries.map(([id, u]) => {
-      const name = u.name || u.displayName || u.username || 'Unknown';
-      const email = u.email || '—';
-      const joined = u.createdAt || u.joinedAt || u.timestamp || 0;
-
-      return `<tr>
-        <td>
-          <div class="user-cell">
-            <div class="avatar">${getUserInitial(name)}</div>
-            <div>
-              <div style="font-weight:600;">${name}</div>
-              <div style="font-size:11px; color:var(--text-muted);">${id}</div>
-            </div>
-          </div>
-        </td>
-        <td style="font-size:13px; color:var(--text-secondary);">${email}</td>
-        <td style="font-size:13px; color:var(--text-secondary);">${formatDate(joined)}</td>
-        <td>
-          <button class="btn btn-danger" onclick="confirmDeleteUser('${id}','${name.replace(/'/g,"\\'")}')"><i class="fas fa-trash"></i> Remove</button>
-        </td>
-      </tr>`;
+    const s=(document.getElementById('userSearch')?.value||'').toLowerCase();
+    const entries=Object.entries(usersData).filter(([id,u])=>{const n=(u.name||u.displayName||u.username||'').toLowerCase();const e=(u.email||'').toLowerCase();return n.includes(s)||e.includes(s)||id.toLowerCase().includes(s);});
+    document.getElementById('userCount').textContent=`(${entries.length})`;
+    const tbody=document.getElementById('userBody');
+    if(!entries.length){tbody.innerHTML=`<tr><td colspan="4"><div class="empty-state"><i class="fas fa-users"></i><p>No users found</p></div></td></tr>`;return;}
+    tbody.innerHTML=entries.map(([id,u])=>{
+      const name=u.name||u.displayName||u.username||'Unknown',email=u.email||'—',joined=u.createdAt||u.joinedAt||u.timestamp||0;
+      return `<tr><td><div class="user-cell"><div class="avatar">${getUserInitial(name)}</div><div><div style="font-weight:600;">${name}</div><div style="font-size:11px;color:var(--text-muted);">${id}</div></div></div></td><td style="font-size:13px;color:var(--text-secondary);">${email}</td><td style="font-size:13px;color:var(--text-secondary);">${formatDate(joined)}</td><td><button class="btn btn-danger" onclick="confirmDeleteUser('${id}','${name.replace(/'/g,"\\'")}')"><i class="fas fa-trash"></i> Remove</button></td></tr>`;
     }).join('');
   }
 
@@ -1105,30 +721,13 @@
   // Render: Cart
   // ============================================
   function renderCart() {
-    const entries = Object.entries(cartData);
-    document.getElementById('cartCount').textContent = `(${entries.length})`;
-    const tbody = document.getElementById('cartBody');
-
-    if (!entries.length) {
-      tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><i class="fas fa-shopping-cart"></i><p>No cart items</p></div></td></tr>`;
-      return;
-    }
-
-    tbody.innerHTML = entries.map(([id, item]) => {
-      const itemName = item.vehicleName || item.name || item.title || 'Unknown Item';
-      const userName = item.userName || item.userEmail || '—';
-      const price = item.price ? 'Rs. ' + Number(item.price).toLocaleString() : '—';
-      const added = item.addedAt || item.timestamp || 0;
-
-      return `<tr>
-        <td style="font-weight:600;">${itemName}</td>
-        <td style="font-size:13px; color:var(--text-secondary);">${userName}</td>
-        <td><span class="price">${price}</span></td>
-        <td style="font-size:13px; color:var(--text-secondary);">${formatDate(added)}</td>
-        <td>
-          <button class="btn btn-danger" onclick="confirmDeleteCartItem('${id}','${itemName.replace(/'/g,"\\'")}')"><i class="fas fa-trash"></i> Remove</button>
-        </td>
-      </tr>`;
+    const entries=Object.entries(cartData);
+    document.getElementById('cartCount').textContent=`(${entries.length})`;
+    const tbody=document.getElementById('cartBody');
+    if(!entries.length){tbody.innerHTML=`<tr><td colspan="5"><div class="empty-state"><i class="fas fa-shopping-cart"></i><p>No cart items</p></div></td></tr>`;return;}
+    tbody.innerHTML=entries.map(([id,item])=>{
+      const itemName=item.vehicleName||item.name||item.title||'Unknown Item',userName=item.userName||item.userEmail||'—',price=item.price?'Rs. '+Number(item.price).toLocaleString():'—',added=item.addedAt||item.timestamp||0;
+      return `<tr><td style="font-weight:600;">${itemName}</td><td style="font-size:13px;color:var(--text-secondary);">${userName}</td><td><span class="price">${price}</span></td><td style="font-size:13px;color:var(--text-secondary);">${formatDate(added)}</td><td><button class="btn btn-danger" onclick="confirmDeleteCartItem('${id}','${itemName.replace(/'/g,"\\'")}')"><i class="fas fa-trash"></i> Remove</button></td></tr>`;
     }).join('');
   }
 
@@ -1136,358 +735,135 @@
   // Stats
   // ============================================
   function updateStats() {
-    const vehicleCount = Object.keys(vehiclesData).length;
-    const userCount = Object.keys(usersData).length;
-    const cartCount = Object.keys(cartData).length;
-
-    let expiring = 0;
-    let extended = 0;
-    Object.values(vehiclesData).forEach(v => {
-      const remaining = getRemainingMs(v);
-      if (remaining > 0 && remaining / MS_PER_DAY <= 3) expiring++;
-      if (isVehicleExtended(v)) extended++;
-    });
-
-    document.getElementById('statVehicles').textContent = vehicleCount;
-    document.getElementById('statUsers').textContent = userCount;
-    document.getElementById('statCart').textContent = cartCount;
-    document.getElementById('statExpiring').textContent = expiring;
-    document.getElementById('statExtended').textContent = extended;
-
-    document.getElementById('vehicleBadge').textContent = vehicleCount;
-    document.getElementById('userBadge').textContent = userCount;
-    document.getElementById('cartBadge').textContent = cartCount;
+    const vc=Object.keys(vehiclesData).length,uc=Object.keys(usersData).length,cc=Object.keys(cartData).length;
+    let exp=0,ext=0;
+    Object.values(vehiclesData).forEach(v=>{const r=getRemainingMs(v);if(r>0&&r/MS_PER_DAY<=3)exp++;if(isVehicleExtended(v))ext++;});
+    document.getElementById('statVehicles').textContent=vc;
+    document.getElementById('statUsers').textContent=uc;
+    document.getElementById('statCart').textContent=cc;
+    document.getElementById('statExpiring').textContent=exp;
+    document.getElementById('statExtended').textContent=ext;
+    document.getElementById('vehicleBadge').textContent=vc;
+    document.getElementById('userBadge').textContent=uc;
+    document.getElementById('cartBadge').textContent=cc;
   }
 
   // ============================================
-  // Countdown Tick (every 1 second)
+  // Countdown Tick
   // ============================================
   function startCountdownTick() {
-    if (countdownInterval) clearInterval(countdownInterval);
-    countdownInterval = setInterval(() => {
-      document.querySelectorAll('[data-countdown-id]').forEach(el => {
-        const id = el.getAttribute('data-countdown-id');
-        const realId = id.replace('dash-', '');
-        const v = vehiclesData[realId];
-        if (!v) return;
-        const remaining = getRemainingMs(v);
-        el.textContent = formatCountdown(remaining);
-        el.style.color = getCountdownColor(remaining, isVehicleExtended(v));
+    if(countdownInterval) clearInterval(countdownInterval);
+    countdownInterval=setInterval(()=>{
+      document.querySelectorAll('[data-countdown-id]').forEach(el=>{
+        const id=el.getAttribute('data-countdown-id').replace('dash-',''),v=vehiclesData[id];
+        if(!v)return;const r=getRemainingMs(v);el.textContent=formatCountdown(r);el.style.color=getCountdownColor(r,isVehicleExtended(v));
       });
-
-      document.querySelectorAll('[data-countdown-bar]').forEach(el => {
-        const id = el.getAttribute('data-countdown-bar');
-        const v = vehiclesData[id];
-        if (!v) return;
-        const remaining = getRemainingMs(v);
-        const pct = getCountdownPercent(remaining);
-        el.style.width = pct + '%';
-        el.style.background = getCountdownColor(remaining, isVehicleExtended(v));
+      document.querySelectorAll('[data-countdown-bar]').forEach(el=>{
+        const id=el.getAttribute('data-countdown-bar'),v=vehiclesData[id];
+        if(!v)return;const r=getRemainingMs(v);el.style.width=getCountdownPercent(r)+'%';el.style.background=getCountdownColor(r,isVehicleExtended(v));
       });
-
-      // Also update extend results if visible
       updateExtendCountdowns();
-    }, 1000);
+    },1000);
   }
 
   // ============================================
-  // Auto-Delete (every 60 seconds + on data change)
+  // Auto-Delete
   // ============================================
   function startAutoDeleteCheck() {
-    if (autoDeleteInterval) clearInterval(autoDeleteInterval);
-    autoDeleteInterval = setInterval(() => purgeExpired(false), 60000);
+    if(autoDeleteInterval) clearInterval(autoDeleteInterval);
+    autoDeleteInterval=setInterval(()=>purgeExpired(false),60000);
   }
-
-  function purgeExpired(showMessage = true) {
-    const toDelete = [];
-    Object.entries(vehiclesData).forEach(([id, v]) => {
-      if (getRemainingMs(v) <= 0) {
-        toDelete.push({ id, name: getVehicleName(v) });
-      }
-    });
-
-    if (!toDelete.length) {
-      if (showMessage) showToast('No expired vehicles to purge', 'info');
-      return;
-    }
-
-    const updates = {};
-    toDelete.forEach(({ id }) => { updates[id] = null; });
-    db.ref('vehicles').update(updates).then(() => {
-      const count = toDelete.length;
-      showToast(`Auto-deleted ${count} expired vehicle${count > 1 ? 's' : ''}`, 'danger');
-    }).catch(err => {
-      showToast('Auto-delete failed: ' + err.message, 'danger');
-    });
+  function purgeExpired(showMsg=true) {
+    const toDel=[];
+    Object.entries(vehiclesData).forEach(([id,v])=>{if(getRemainingMs(v)<=0)toDel.push({id,name:getVehicleName(v)});});
+    if(!toDel.length){if(showMsg)showToast('No expired vehicles to purge','info');return;}
+    const updates={};toDel.forEach(({id})=>updates[id]=null);
+    db.ref('vehicles').update(updates).then(()=>showToast(`Auto-deleted ${toDel.length} expired vehicle${toDel.length>1?'s':''}`,'danger')).catch(e=>showToast('Auto-delete failed: '+e.message,'danger'));
   }
 
   // ============================================
-  // Extend Vehicle
+  // Extend
   // ============================================
   function extendVehicle(id) {
-    const v = vehiclesData[id];
-    if (!v) return;
-
-    const newExpiresAt = Date.now() + EXTEND_PERIOD_DAYS * MS_PER_DAY;
-    const name = getVehicleName(v);
-
-    db.ref('vehicles/' + id).update({
-      expiresAt: newExpiresAt,
-      extendedAt: Date.now(),
-      extendedFrom: getVehicleEmail(v) || 'admin'
-    }).then(() => {
-      showToast(`"${name}" extended to ${EXTEND_PERIOD_DAYS} days from now`, 'extend');
-    }).catch(err => {
-      showToast('Extend failed: ' + err.message, 'danger');
-    });
+    const v=vehiclesData[id];if(!v)return;
+    db.ref('vehicles/'+id).update({expiresAt:Date.now()+EXTEND_PERIOD_DAYS*MS_PER_DAY,extendedAt:Date.now(),extendedFrom:getVehicleEmail(v)||'admin'})
+      .then(()=>showToast(`"${getVehicleName(v)}" extended to ${EXTEND_PERIOD_DAYS} days`,'extend'))
+      .catch(e=>showToast('Extend failed: '+e.message,'danger'));
   }
-
   function extendMultipleVehicles(ids) {
-    const updates = {};
-    const newExpiresAt = Date.now() + EXTEND_PERIOD_DAYS * MS_PER_DAY;
-    const extendedAt = Date.now();
-    ids.forEach(id => {
-      updates[`${id}/expiresAt`] = newExpiresAt;
-      updates[`${id}/extendedAt`] = extendedAt;
-    });
-
-    db.ref('vehicles').update(updates).then(() => {
-      showToast(`${ids.length} vehicle${ids.length > 1 ? 's' : ''} extended to ${EXTEND_PERIOD_DAYS} days`, 'extend');
-    }).catch(err => {
-      showToast('Bulk extend failed: ' + err.message, 'danger');
-    });
+    const updates={},exp=Date.now()+EXTEND_PERIOD_DAYS*MS_PER_DAY,ext=Date.now();
+    ids.forEach(id=>{updates[`${id}/expiresAt`]=exp;updates[`${id}/extendedAt`]=ext;});
+    db.ref('vehicles').update(updates).then(()=>showToast(`${ids.length} vehicle${ids.length>1?'s':''} extended to ${EXTEND_PERIOD_DAYS} days`,'extend')).catch(e=>showToast('Bulk extend failed: '+e.message,'danger'));
   }
 
   // ============================================
-  // Search by Email (Extend Page)
+  // Search by Email
   // ============================================
-  let lastSearchEmail = '';
-
   function searchByEmail() {
-    const email = document.getElementById('extendEmailInput').value.trim().toLowerCase();
-    if (!email) {
-      showToast('Please enter an email address', 'info');
-      return;
-    }
-
-    lastSearchEmail = email;
-    const resultsContainer = document.getElementById('extendResults');
-
-    // Show loading
-    resultsContainer.innerHTML = `
-      <div class="extend-results">
-        <div style="text-align:center; padding:30px; color:var(--text-muted);">
-          <i class="fas fa-spinner fa-spin" style="font-size:24px; margin-bottom:8px; display:block;"></i>
-          Searching for vehicles by ${email}...
-        </div>
-      </div>`;
-
-    // Search through vehicles for matching email
-    // Check multiple possible email field names
-    const matches = [];
-    Object.entries(vehiclesData).forEach(([id, v]) => {
-      const vehicleEmail = getVehicleEmail(v).toLowerCase();
-      if (vehicleEmail === email) {
-        matches.push({ id, ...v });
-      }
+    const email=document.getElementById('extendEmailInput').value.trim().toLowerCase();
+    if(!email){showToast('Please enter an email address','info');return;}
+    const rc=document.getElementById('extendResults');
+    rc.innerHTML=`<div class="extend-results"><div style="text-align:center;padding:30px;color:var(--text-muted);"><i class="fas fa-spinner fa-spin" style="font-size:24px;margin-bottom:8px;display:block;"></i>Searching...</div></div>`;
+    const matches=[];
+    Object.entries(vehiclesData).forEach(([id,v])=>{if(getVehicleEmail(v).toLowerCase()===email)matches.push({id,...v});});
+    Object.entries(usersData).forEach(([uid,u])=>{
+      if((u.email||'').toLowerCase()===email){Object.entries(vehiclesData).forEach(([vid,v])=>{const ve=getVehicleEmail(v).toLowerCase(),vu=v.userId||v.uid||v.ownerId||'';if((vu===uid||ve===email)&&!matches.find(m=>m.id===vid))matches.push({id:vid,...v});});}
     });
-
-    // Also search users for this email, then find their vehicles
-    let userMatchedIds = [];
-    Object.entries(usersData).forEach(([uid, u]) => {
-      if ((u.email || '').toLowerCase() === email) {
-        // Find vehicles by this user
-        Object.entries(vehiclesData).forEach(([vid, v]) => {
-          const vEmail = getVehicleEmail(v).toLowerCase();
-          const vUid = v.userId || v.uid || v.ownerId || '';
-          if ((vUid === uid || vEmail === email) && !matches.find(m => m.id === vid)) {
-            matches.push({ id: vid, ...v });
-          }
-        });
-      }
-    });
-
-    // Render results
-    if (!matches.length) {
-      resultsContainer.innerHTML = `
-        <div class="extend-results">
-          <div class="empty-state" style="padding:40px 20px;">
-            <i class="fas fa-search" style="font-size:36px;"></i>
-            <p>No vehicles found for <strong style="color:var(--text-primary);">${email}</strong></p>
-            <p style="font-size:12px; margin-top:8px;">Make sure vehicle ads have an email field (email, sellerEmail, userEmail, or ownerEmail)</p>
-          </div>
-        </div>`;
-      return;
-    }
-
-    const extendableIds = matches.filter(m => !m.expiresAt).map(m => m.id);
-
-    resultsContainer.innerHTML = `
-      <div class="extend-results">
-        <div class="extend-results-header">
-          <h4>Found ${matches.length} vehicle${matches.length > 1 ? 's' : ''} for <span style="color:var(--accent);">${email}</span></h4>
-          ${extendableIds.length > 0 ? `<button class="extend-all-btn" onclick="extendMultipleVehicles(${JSON.stringify(extendableIds)})"><i class="fas fa-arrows-rotate"></i> Extend All (${extendableIds.length})</button>` : ''}
-        </div>
-        ${matches.map(v => {
-          const id = v.id;
-          const name = getVehicleName(v);
-          const price = getVehiclePrice(v);
-          const addedAt = v.addedAt || v.timestamp || v.createdAt || 0;
-          const remaining = getRemainingMs(v);
-          const status = getStatus(remaining);
-          const extended = isVehicleExtended(v);
-          const color = getCountdownColor(remaining, extended);
-          const formatted = formatCountdown(remaining);
-
-          return `<div class="extend-vehicle-card" data-extend-card="${id}">
-            <div class="vehicle-thumb">${getVehicleImage(v)}</div>
-            <div class="ev-info">
-              <div class="ev-name">${name}</div>
-              <div class="ev-meta">
-                ${price} &middot; Added ${formatDate(addedAt)}
-                ${extended ? ' <span class="extend-info-tag"><i class="fas fa-arrows-rotate" style="font-size:8px"></i> Extended</span>' : ''}
-              </div>
-              <div class="ev-countdown" style="color:${color};" data-extend-countdown="${id}">
-                ${remaining > 0 ? formatted : 'EXPIRED'}
-              </div>
-              <div class="ev-status">${getStatusBadge(status, extended)}</div>
-            </div>
-            <div class="ev-actions">
-              ${!extended && remaining > 0 ? `<button class="btn btn-extend" onclick="extendVehicle('${id}'); setTimeout(()=>searchByEmail(),800);"><i class="fas fa-arrows-rotate"></i> Extend to ${EXTEND_PERIOD_DAYS}d</button>` : ''}
-              ${extended ? `<span style="font-size:11px; color:var(--extend); font-weight:600;"><i class="fas fa-check"></i> Already Extended</span>` : ''}
-              <button class="btn btn-danger" onclick="confirmDeleteVehicle('${id}','${name.replace(/'/g,"\\'")}'); setTimeout(()=>searchByEmail(),800);"><i class="fas fa-trash"></i></button>
-            </div>
-          </div>`;
-        }).join('')}
-      </div>`;
+    if(!matches.length){rc.innerHTML=`<div class="extend-results"><div class="empty-state" style="padding:40px 20px;"><i class="fas fa-search" style="font-size:36px;"></i><p>No vehicles found for <strong style="color:var(--text-primary);">${email}</strong></p><p style="font-size:12px;margin-top:8px;">Make sure vehicle ads have an email field</p></div></div>`;return;}
+    const extIds=matches.filter(m=>!m.expiresAt).map(m=>m.id);
+    rc.innerHTML=`<div class="extend-results"><div class="extend-results-header"><h4>Found ${matches.length} vehicle${matches.length>1?'s':''} for <span style="color:var(--accent);">${email}</span></h4>${extIds.length>0?`<button class="extend-all-btn" onclick="extendMultipleVehicles(${JSON.stringify(extIds)})"><i class="fas fa-arrows-rotate"></i> Extend All (${extIds.length})</button>`:''}</div>${matches.map(v=>{
+      const id=v.id,name=getVehicleName(v),price=getVehiclePrice(v),addedAt=v.addedAt||v.timestamp||v.createdAt||0,remaining=getRemainingMs(v),status=getStatus(remaining),extended=isVehicleExtended(v),color=getCountdownColor(remaining,extended),formatted=formatCountdown(remaining);
+      return `<div class="extend-vehicle-card" data-extend-card="${id}"><div class="vehicle-thumb">${getVehicleImage(v)}</div><div class="ev-info"><div class="ev-name">${name}</div><div class="ev-meta">${price} &middot; Added ${formatDate(addedAt)}${extended?' <span class="extend-info-tag"><i class="fas fa-arrows-rotate" style="font-size:8px"></i> Extended</span>':''}</div><div class="ev-countdown" style="color:${color};" data-extend-countdown="${id}">${remaining>0?formatted:'EXPIRED'}</div><div class="ev-status">${getStatusBadge(status,extended)}</div></div><div class="ev-actions">${!extended&&remaining>0?`<button class="btn btn-extend" onclick="extendVehicle('${id}');setTimeout(()=>searchByEmail(),800);"><i class="fas fa-arrows-rotate"></i> Extend to ${EXTEND_PERIOD_DAYS}d</button>`:''}${extended?`<span style="font-size:11px;color:var(--extend);font-weight:600;"><i class="fas fa-check"></i> Already Extended</span>`:''}<button class="btn btn-danger" onclick="confirmDeleteVehicle('${id}','${name.replace(/'/g,"\\'")}');setTimeout(()=>searchByEmail(),800);"><i class="fas fa-trash"></i></button></div></div>`;
+    }).join('')}</div>`;
   }
-
   function updateExtendCountdowns() {
-    document.querySelectorAll('[data-extend-countdown]').forEach(el => {
-      const id = el.getAttribute('data-extend-countdown');
-      const v = vehiclesData[id];
-      if (!v) return;
-      const remaining = getRemainingMs(v);
-      const extended = isVehicleExtended(v);
-      el.style.color = getCountdownColor(remaining, extended);
-      el.textContent = remaining > 0 ? formatCountdown(remaining) : 'EXPIRED';
-    });
-  }
-
-  // ============================================
-  // Settings
-  // ============================================
-  function UPDATE_DELETE_PERIOD(days) {
-    DELETE_PERIOD_DAYS = Math.max(1, Math.min(365, days));
-    showToast(`Auto-delete period set to ${DELETE_PERIOD_DAYS} days`, 'info');
-    renderVehicles();
-    renderDashboardVehicles();
+    document.querySelectorAll('[data-extend-countdown]').forEach(el=>{const id=el.getAttribute('data-extend-countdown'),v=vehiclesData[id];if(!v)return;const r=getRemainingMs(v);el.style.color=getCountdownColor(r,isVehicleExtended(v));el.textContent=r>0?formatCountdown(r):'EXPIRED';});
   }
 
   // ============================================
   // Modals
   // ============================================
-  function showModal(title, message, onConfirm, confirmClass = 'btn-danger', confirmIcon = 'fa-trash', confirmText = 'Confirm') {
-    const container = document.getElementById('modalContainer');
-    container.innerHTML = `
-      <div class="modal-overlay" onclick="closeModal(event)">
-        <div class="modal-box" onclick="event.stopPropagation()">
-          <h3>${title}</h3>
-          <p>${message}</p>
-          <div class="modal-actions">
-            <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
-            <button class="btn ${confirmClass}" id="modalConfirmBtn"><i class="fas ${confirmIcon}"></i> ${confirmText}</button>
-          </div>
-        </div>
-      </div>`;
-    document.getElementById('modalConfirmBtn').addEventListener('click', () => {
-      closeModal();
-      onConfirm();
-    });
+  function showModal(title,msg,onConfirm) {
+    document.getElementById('modalContainer').innerHTML=`<div class="modal-overlay" onclick="closeModal(event)"><div class="modal-box" onclick="event.stopPropagation()"><h3>${title}</h3><p>${msg}</p><div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-danger" id="modalConfirmBtn"><i class="fas fa-trash"></i> Confirm</button></div></div></div>`;
+    document.getElementById('modalConfirmBtn').addEventListener('click',()=>{closeModal();onConfirm();});
   }
+  function closeModal(e){if(e&&e.target!==e.currentTarget)return;document.getElementById('modalContainer').innerHTML='';}
+  function confirmDeleteVehicle(id,name){showModal('Delete Vehicle',`Delete <strong>${name}</strong> permanently?`,()=>{db.ref('vehicles/'+id).remove().then(()=>showToast(`"${name}" deleted`,'danger'));});}
+  function confirmDeleteUser(id,name){showModal('Remove User',`Remove <strong>${name}</strong> and their cart?`,()=>{db.ref('users/'+id).remove();db.ref('cart').orderByChild('userId').equalTo(id).once('value',snap=>{if(snap.exists()){const u={};Object.keys(snap.val()).forEach(k=>u[k]=null);db.ref('cart').update(u);}});showToast(`User "${name}" removed`,'danger');});}
+  function confirmDeleteCartItem(id,name){showModal('Remove Cart Item',`Remove <strong>${name}</strong>?`,()=>{db.ref('cart/'+id).remove().then(()=>showToast(`"${name}" removed`,'danger'));});}
+  function confirmPurge(){showModal('Purge Expired','Delete all expired vehicle ads now?',()=>purgeExpired(true));}
 
-  function closeModal(e) {
-    if (e && e.target !== e.currentTarget) return;
-    document.getElementById('modalContainer').innerHTML = '';
-  }
+  // ============================================
+  // Firebase Listeners (attached after login)
+  // ============================================
+  function attachListeners() {
+    if(listenersAttached) return;
+    listenersAttached = true;
 
-  function confirmDeleteVehicle(id, name) {
-    showModal('Delete Vehicle', `Are you sure you want to permanently delete <strong>${name}</strong>? This cannot be undone.`, () => {
-      db.ref('vehicles/' + id).remove().then(() => showToast(`Vehicle "${name}" deleted`, 'danger'));
-    });
-  }
-
-  function confirmDeleteUser(id, name) {
-    showModal('Remove User', `Remove user <strong>${name}</strong> and their cart items?`, () => {
-      db.ref('users/' + id).remove();
-      db.ref('cart').orderByChild('userId').equalTo(id).once('value', snap => {
-        if (snap.exists()) {
-          const updates = {};
-          Object.keys(snap.val()).forEach(k => updates[k] = null);
-          db.ref('cart').update(updates);
-        }
+    db.ref('vehicles').on('value', snap => {
+      vehiclesData = snap.val() || {};
+      updateStats(); renderVehicles(); renderDashboardVehicles();
+      Object.entries(vehiclesData).forEach(([id,v])=>{
+        if(getRemainingMs(v)<=0){db.ref('vehicles/'+id).remove();showToast(`Auto-deleted: ${getVehicleName(v)}`,'danger');}
       });
-      showToast(`User "${name}" removed`, 'danger');
+    }, err => showToast('Vehicles error: '+err.message,'danger'));
+
+    db.ref('users').on('value', snap => {
+      usersData = snap.val() || {};
+      updateStats(); renderUsers();
+    }, err => showToast('Users error: '+err.message,'danger'));
+
+    db.ref('Mycart').on('value', snap => {
+      cartData = snap.val() || {};
+      updateStats(); renderCart();
+    }, err => showToast('Cart error: '+err.message,'danger'));
+
+    db.ref('vehicles').on('child_added', snap => {
+      const v = snap.val(); if(!v) return;
+      const a = v.addedAt||v.timestamp||v.createdAt||0;
+      if(a && (Date.now()-a)<10000) showToast(`New vehicle: ${getVehicleName(v)}`,'success');
     });
   }
-
-  function confirmDeleteCartItem(id, name) {
-    showModal('Remove Cart Item', `Remove <strong>${name}</strong> from cart?`, () => {
-      db.ref('cart/' + id).remove().then(() => showToast(`"${name}" removed from cart`, 'danger'));
-    });
-  }
-
-  function confirmPurge() {
-    showModal('Purge Expired Vehicles', 'Immediately delete all vehicle ads that have exceeded their expiry period. This cannot be undone.', () => purgeExpired(true));
-  }
-
-  // ============================================
-  // Firebase Real-time Listeners
-  // ============================================
-  db.ref('vehicles').on('value', snap => {
-    vehiclesData = snap.val() || {};
-    updateStats();
-    renderVehicles();
-    renderDashboardVehicles();
-
-    // Auto-delete expired vehicles
-    Object.entries(vehiclesData).forEach(([id, v]) => {
-      if (getRemainingMs(v) <= 0) {
-        db.ref('vehicles/' + id).remove();
-        showToast(`Auto-deleted expired: ${getVehicleName(v)}`, 'danger');
-      }
-    });
-  }, err => showToast('Vehicles listener error: ' + err.message, 'danger'));
-
-  db.ref('users').on('value', snap => {
-    usersData = snap.val() || {};
-    updateStats();
-    renderUsers();
-  }, err => showToast('Users listener error: ' + err.message, 'danger'));
-
-  db.ref('cart').on('value', snap => {
-    cartData = snap.val() || {};
-    updateStats();
-    renderCart();
-  }, err => showToast('Cart listener error: ' + err.message, 'danger'));
-
-  // Toast on new vehicle added
-  db.ref('vehicles').on('child_added', snap => {
-    const v = snap.val();
-    if (!v) return;
-    const addedAt = v.addedAt || v.timestamp || v.createdAt || 0;
-    if (addedAt && (Date.now() - addedAt) < 10000) {
-      showToast(`New vehicle added: ${getVehicleName(v)}`, 'success');
-    }
-  });
-
-  // ============================================
-  // Init
-  // ============================================
-  startCountdownTick();
-  startAutoDeleteCheck();
-  showToast('Admin panel connected to Firebase', 'success');
 </script>
-
 </body>
 </html>
