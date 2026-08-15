@@ -11,21 +11,13 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <style>
-  :root {
-    --bg-deep:#0a0c10;--bg-main:#0f1218;--bg-card:#161b24;--bg-card-hover:#1c2230;
-    --border:#252d3a;--border-light:#2f3a4d;--text-primary:#e8ecf4;--text-secondary:#8a95a8;--text-muted:#556075;
-    --accent:#f59e0b;--accent-dim:rgba(245,158,11,0.12);
-    --danger:#ef4444;--danger-dim:rgba(239,68,68,0.12);
-    --success:#22c55e;--success-dim:rgba(34,197,94,0.12);
-    --info:#3b82f6;--info-dim:rgba(59,130,246,0.12);
-    --extend:#a855f7;--extend-dim:rgba(168,85,247,0.12);
-  }
+  :root{--bg-deep:#0a0c10;--bg-main:#0f1218;--bg-card:#161b24;--bg-card-hover:#1c2230;--border:#252d3a;--border-light:#2f3a4d;--text-primary:#e8ecf4;--text-secondary:#8a95a8;--text-muted:#556075;--accent:#f59e0b;--accent-dim:rgba(245,158,11,0.12);--danger:#ef4444;--danger-dim:rgba(239,68,68,0.12);--success:#22c55e;--success-dim:rgba(34,197,94,0.12);--info:#3b82f6;--info-dim:rgba(59,130,246,0.12);--extend:#a855f7;--extend-dim:rgba(168,85,247,0.12);--home:#06b6d4;--home-dim:rgba(6,182,212,0."")}
   *{margin:0;padding:0;box-sizing:border-box;}
   body{font-family:'Outfit',sans-serif;background:var(--bg-deep);color:var(--text-primary);min-height:100vh;overflow-x:hidden;}
   ::-webkit-scrollbar{width:6px;}::-webkit-scrollbar-track{background:var(--bg-main);}::-webkit-scrollbar-thumb{background:var(--border-light);border-radius:3px;}
 
   .login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;position:relative;}
-  .login-screen::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(circle at 30% 40%,rgba(245,158,11,0.08) 0%,transparent 50%),radial-gradient(circle at 70% 60%,rgba(168,85,247,0.06) 0%,transparent 50%);}
+  .login-screen::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(circle at 30% 40%,rgba(245,158,11,0.08) 0%,transparent 50%),radial-gradient(circle at 70% 60%,rgba(6,182,212,0.06) 0%,transparent 50%);}
   .login-box{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:40px;width:420px;max-width:90vw;position:relative;z-index:1;animation:scale-in .4s cubic-bezier(.16,1,.3,1);}
   .login-box .logo-row{display:flex;align-items:center;gap:12px;margin-bottom:8px;}
   .login-box .logo-icon{width:44px;height:44px;background:var(--accent);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#000;}
@@ -66,7 +58,6 @@
   .page-header{margin-bottom:32px;}
   .page-header h2{font-size:28px;font-weight:800;letter-spacing:-.5px;margin-bottom:4px;}
   .page-header p{color:var(--text-secondary);font-size:14px;}
-
   .stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:32px;}
   .stat-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:20px;transition:all .3s;}
   .stat-card:hover{border-color:var(--border-light);transform:translateY(-2px);}
@@ -89,24 +80,26 @@
   .countdown-bar{width:80px;height:6px;background:var(--bg-main);border-radius:3px;overflow:hidden;}
   .countdown-bar-fill{height:100%;border-radius:3px;transition:width 1s linear;}
   .countdown-text{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;white-space:nowrap;}
-
   .badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;}
   .badge-active{background:var(--success-dim);color:var(--success);}
   .badge-expiring{background:var(--accent-dim);color:var(--accent);}
   .badge-expired{background:var(--danger-dim);color:var(--danger);}
   .badge-extended{background:var(--extend-dim);color:var(--extend);}
+  .badge-home{background:var(--home-dim);color:var(--home);}
 
   .btn{padding:7px 14px;border-radius:7px;font-size:12px;font-weight:600;font-family:'Outfit',sans-serif;cursor:pointer;border:none;transition:all .2s;display:inline-flex;align-items:center;gap:6px;}
   .btn-danger{background:var(--danger-dim);color:var(--danger);}.btn-danger:hover{background:var(--danger);color:#fff;}
   .btn-accent{background:var(--accent-dim);color:var(--accent);}.btn-accent:hover{background:var(--accent);color:#000;}
   .btn-extend{background:var(--extend-dim);color:var(--extend);}.btn-extend:hover{background:var(--extend);color:#fff;}
+  .btn-home{background:var(--home-d"");color:var(--home);}.btn-home:hover{background:var(--home);color:#fff;}
+  .btn-home-on{background:var(--home);color:#fff;}.btn-home-on:hover{filter:brightness(1.1);}
   .btn-ghost{background:transparent;color:var(--text-secondary);border:1px solid var(--border);}.btn-ghost:hover{background:var(--bg-card-hover);color:var(--text-primary);}
 
   .toast-container{position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px;}
   .toast{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:14px 18px;display:flex;align-items:center;gap:10px;font-size:13px;min-width:280px;max-width:420px;animation:toast-in .4s cubic-bezier(.16,1,.3,1);box-shadow:0 8px 30px rgba(0,0,0,.4);}
   .toast.removing{animation:toast-out .3s ease forwards;}
   .toast i{font-size:16px;flex-shrink:0;}
-  .toast-success i{color:var(--success);}.toast-danger i{color:var(--danger);}.toast-info i{color:var(--info);}.toast-extend i{color:var(--extend);}
+  .toast-success i{color:var(--success);}.toast-danger i{color:var(--danger);}.toast-info i{color:var(--info);}.toast-extend i{color:var(--extend);}.toast-home i{color:var(--home);}
   @keyframes toast-in{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
   @keyframes toast-out{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(40px)}}
 
@@ -121,7 +114,6 @@
   .vehicle-cell{display:flex;align-items:center;gap:10px;}
   .price{font-family:'JetBrains Mono',monospace;font-weight:600;color:var(--success);}
   .auto-delete-label{font-size:10px;color:var(--text-muted);margin-top:2px;}
-  .extend-info-tag{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;background:var(--extend-dim);color:var(--extend);text-transform:uppercase;letter-spacing:.5px;}
 
   .modal-overlay{position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;animation:fade-in .2s ease;}
   .modal-box{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:28px;width:440px;max-width:90vw;animation:scale-in .3s cubic-bezier(.16,1,.3,1);}
@@ -129,39 +121,33 @@
   .modal-box p{font-size:14px;color:var(--text-secondary);margin-bottom:24px;line-height:1.5;}
   .modal-actions{display:flex;gap:10px;justify-content:flex-end;}
 
-  .bg-grid{position:fixed;inset:0;z-index:-1;pointer-events:none;background-image:radial-gradient(circle at 20% 50%,rgba(245,158,11,0.03) 0%,transparent 50%),radial-gradient(circle at 80% 20%,rgba(168,85,247,0.03) 0%,transparent 50%),linear-gradient(rgba(255,255,255,0.01) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.01) 1px,transparent 1px);background-size:100% 100%,100% 100%,40px 40px,40px 40px;}
+  .bg-grid{position:fixed;inset:0;z-index:-1;pointer-events:none;background-image:radial-gradient(circle at 20% 50%,rgba(245,158,11,0.03) 0%,transparent 50%),radial-gradient(circle at 80% 20%,rgba(6,182,212,0.03) 0%,transparent 50%),linear-gradient(rgba(255,255,255,0.01) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.01) 1px,transparent 1px);background-size:100% 100%,100% 100%,40px 40px,40px 40px;}
   .section-page{display:none;}.section-page.active{display:block;}
 
   .extend-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:24px;position:relative;overflow:hidden;}
-  .extend-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--extend),var(--accent));}
+  .extend-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--home),var(--accent));}
   .extend-panel h3{font-size:18px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:10px;}
-  .extend-panel h3 i{color:var(--extend);}
+  .extend-panel h3 i{color:var(--home);}
   .extend-panel .desc{font-size:13px;color:var(--text-secondary);margin-bottom:20px;}
   .extend-search-row{display:flex;gap:10px;align-items:stretch;flex-wrap:wrap;}
   .extend-input{flex:1;min-width:200px;background:var(--bg-main);border:1px solid var(--border);border-radius:8px;padding:12px 16px;color:var(--text-primary);font-size:14px;font-family:'Outfit',sans-serif;outline:none;transition:border-color .2s;}
-  .extend-input:focus{border-color:var(--extend);}
+  .extend-input:focus{border-color:var(--home);}
   .extend-input::placeholder{color:var(--text-muted);}
-  .extend-btn{padding:12px 24px;border-radius:8px;font-size:14px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer;border:none;background:var(--extend);color:#fff;transition:all .2s;display:flex;align-items:center;gap:8px;white-space:nowrap;}
+  .extend-btn{padding:12px 24px;border-radius:8px;font-size:14px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer;border:none;background:var(--home);color:#fff;transition:all .2s;display:flex;align-items:center;gap:8px;white-space:nowrap;}
   .extend-btn:hover{filter:brightness(1.15);transform:translateY(-1px);}
-
-  .days-input-wrap{display:flex;align-items:center;gap:6px;}
-  .days-input{width:70px;background:var(--bg-main);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--extend);font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;outline:none;text-align:center;}
-  .days-input:focus{border-color:var(--extend);}
-  .days-label{font-size:12px;color:var(--text-muted);font-weight:500;}
 
   .extend-results{margin-top:20px;border-top:1px solid var(--border);padding-top:20px;}
   .extend-results-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;}
   .extend-results-header h4{font-size:14px;font-weight:600;}
-  .extend-vehicle-card{background:var(--bg-main);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:10px;display:flex;align-items:center;gap:16px;transition:all .2s;}
-  .extend-vehicle-card:hover{border-color:var(--border-light);}
-  .extend-vehicle-card .ev-info{flex:1;}
-  .extend-vehicle-card .ev-name{font-weight:600;font-size:15px;margin-bottom:2px;}
-  .extend-vehicle-card .ev-meta{font-size:12px;color:var(--text-muted);}
-  .extend-vehicle-card .ev-countdown{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;margin-top:4px;}
-  .extend-vehicle-card .ev-status{margin-top:6px;}
-  .extend-vehicle-card .ev-actions{display:flex;flex-direction:column;gap:6px;align-items:flex-end;}
-  .extend-all-btn{padding:8px 18px;border-radius:7px;font-size:12px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer;border:none;background:var(--extend);color:#fff;transition:all .2s;display:inline-flex;align-items:center;gap:6px;}
-  .extend-all-btn:hover{filter:brightness(1.15);}
+  .ev-card{background:var(--bg-main);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:10px;transition:all .2s;}
+  .ev-card:hover{border-color:var(--border-light);}
+  .ev-card-top{display:flex;align-items:center;gap:16px;}
+  .ev-card-top .ev-info{flex:1;}
+  .ev-card-top .ev-name{font-weight:600;font-size:15px;margin-bottom:2px;}
+  .ev-card-top .ev-meta{font-size:12px;color:var(--text-muted);}
+  .ev-card-top .ev-countdown{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;margin-top:4px;}
+  .ev-card-top .ev-status{margin-top:6px;}
+  .ev-card-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);}
 
   .debug-info{background:var(--bg-main);border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin-top:12px;font-size:12px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;word-break:break-all;line-height:1.6;}
   .debug-info strong{color:var(--accent);}
@@ -170,6 +156,22 @@
   .user-bar .user-email{color:var(--accent);font-weight:600;}
   .logout-btn{margin-left:auto;padding:4px 10px;border-radius:5px;font-size:11px;font-weight:600;font-family:'Outfit',sans-serif;cursor:pointer;border:none;background:var(--danger-dim);color:var(--danger);transition:all .2s;display:flex;align-items:center;gap:4px;}
   .logout-btn:hover{background:var(--danger);color:#fff;}
+
+  .home-days-popup{display:inline-flex;align-items:center;gap:6px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:6px 10px;margin-left:4px;animation:fade-in .2s ease;}
+  .home-days-btn{padding:5px 12px;border-radius:5px;font-size:11px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer;border:none;transition:all .2s;}
+  .home-days-btn:hover{filter:brightness(1.15);}
+
+  .saved-indicator{font-size:11px;color:var(--success);display:none;margin-left:8px;animation:fade-in .3s ease;}
+  .saved-indicator.show{display:inline-flex;align-items:center;gap:4px;}
+  .settings-row{margin-bottom:20px;}
+  .settings-row label{font-size:13px;font-weight:600;display:block;margin-bottom:6px;}
+  .settings-row .hint{font-size:11px;color:var(--text-muted);margin-top:4px;}
+  .settings-row .hint strong{color:var(--accent);}
+  .settings-input{background:var(--bg-main);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-family:'JetBrains Mono',monospace;font-size:14px;width:120px;outline:none;}
+  .settings-input:focus{border-color:var(--accent);}
+  .settings-debug{background:var(--bg-main);border:1px solid var(--border);border-radius:8px;padding:12px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-muted);line-height:1.8;}
+  .settings-debug strong{color:var(--accent);}
+  .settings-divider{padding-top:12px;border-top:1px solid var(--border);margin-top:12px;}
 
   @media(max-width:900px){
     .admin-layout{grid-template-columns:1fr;}
@@ -208,9 +210,8 @@
     <div class="nav-section">
       <div class="nav-label">Manage</div>
       <div class="nav-item" data-page="vehicles" onclick="switchPage('vehicles')"><i class="fas fa-car-side"></i> Vehicles<span class="nav-badge" id="vehicleBadge">0</span></div>
-      <div class="nav-item" data-page="extend" onclick="switchPage('extend')"><i class="fas fa-clock-rotate-left"></i> Extend Ads</div>
+      <div class="nav-item" data-page="extend" onclick="switchPage('extend')"><i class="fas fa-magnifying-glass"></i> Search &amp; Manage</div>
       <div class="nav-item" data-page="users" onclick="switchPage('users')"><i class="fas fa-users"></i> Users<span class="nav-badge" id="userBadge">0</span></div>
-      <div class="nav-item" data-page="cart" onclick="switchPage('cart')"><i class="fas fa-shopping-cart"></i> My Cart<span class="nav-badge" id="cartBadge">0</span></div>
     </div>
     <div class="nav-section"><div class="nav-label">System</div><div class="nav-item" data-page="settings" onclick="switchPage('settings')"><i class="fas fa-cog"></i> Settings</div></div>
     <div class="sidebar-footer"><span class="status-dot"></span><span style="font-size:12px;color:var(--text-secondary);">Live &mdash; Auto-delete active</span></div>
@@ -218,7 +219,7 @@
 
   <main class="main-content">
     <button class="mobile-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')"><i class="fas fa-bars"></i></button>
-    <div class="user-bar" id="userBar"><i class="fas fa-shield-halved" style="color:var(--success);"></i> Signed in as <span class="user-email" id="userBarEmail">—</span><button class="logout-btn" onclick="doLogout()"><i class="fas fa-right-from-bracket"></i> Sign Out</button></div>
+    <div class="user-bar"><i class="fas fa-shield-halved" style="color:var(--success);"></i> Signed in as <span class="user-email" id="userBarEmail">—</span><button class="logout-btn" onclick="doLogout()"><i class="fas fa-right-from-bracket"></i> Sign Out</button></div>
 
     <!-- DASHBOARD -->
     <div class="section-page active" id="page-dashboard">
@@ -226,11 +227,11 @@
       <div class="stats-row">
         <div class="stat-card"><div class="stat-icon" style="background:var(--accent-dim);color:var(--accent);"><i class="fas fa-car-side"></i></div><div class="stat-value" id="statVehicles">—</div><div class="stat-label">Active Vehicles</div></div>
         <div class="stat-card"><div class="stat-icon" style="background:var(--info-dim);color:var(--info);"><i class="fas fa-users"></i></div><div class="stat-value" id="statUsers">—</div><div class="stat-label">Registered Users</div></div>
-        <div class="stat-card"><div class="stat-icon" style="background:var(--success-dim);color:var(--success);"><i class="fas fa-shopping-cart"></i></div><div class="stat-value" id="statCart">—</div><div class="stat-label">Cart Items</div></div>
         <div class="stat-card"><div class="stat-icon" style="background:var(--danger-dim);color:var(--danger);"><i class="fas fa-clock"></i></div><div class="stat-value" id="statExpiring">—</div><div class="stat-label">Expiring Soon</div></div>
         <div class="stat-card"><div class="stat-icon" style="background:var(--extend-dim);color:var(--extend);"><i class="fas fa-arrows-rotate"></i></div><div class="stat-value" id="statExtended">—</div><div class="stat-label">Extended Ads</div></div>
+        <div class="stat-card"><div class="stat-icon" style="background:var(--home-dim);color:var(--home);"><i class="fas fa-house"></i></div><div class="stat-value" id="statHome">—</div><div class="stat-label">On Home</div></div>
       </div>
-      <div class="data-table-wrap">
+      <div class="data-table1-wrap">
         <div class="table-header"><h3>Recent Vehicle Ads</h3><button class="btn btn-ghost" onclick="switchPage('vehicles')"><i class="fas fa-arrow-right"></i> View All</button></div>
         <table class="data-table"><thead><tr><th>Vehicle</th><th>Price</th><th>Status</th><th>Expires In</th></tr></thead><tbody id="dashVehicleBody"><tr><td colspan="4"><div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Loading...</p></div></td></tr></tbody></table>
       </div>
@@ -238,19 +239,19 @@
 
     <!-- VEHICLES -->
     <div class="section-page" id="page-vehicles">
-      <div class="page-header"><h2>Vehicles</h2><p>All vehicle listings with auto-delete countdown</p></div>
+      <div class="page-header"><h2>Vehicles</h2><p>All vehicle listings with 15-day auto-delete countdown</p></div>
       <div class="data-table-wrap">
         <div class="table-header"><h3>All Vehicles <span style="color:var(--text-muted);font-weight:400;font-size:13px;margin-left:8px;" id="vehicleCount"></span></h3><input type="text" class="search-box" placeholder="Search vehicles..." id="vehicleSearch" oninput="renderVehicles()"></div>
-        <table class="data-table"><thead><tr><th>Vehicle</th><th>Price</th><th>Added</th><th>Status</th><th>Countdown</th><th>Actions</th></tr></thead><tbody id="vehicleBody"><tr><td colspan="6"><div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Loading...</p></div></td></tr></tbody></table>
+        <table class="data-table"><thead><tr><th>Vehicle</th><th>Price</th><th>Status</th><th>Countdown</th><th>Home</th><th>Actions</th></tr></thead><tbody id="vehicleBody"><tr><td colspan="6"><div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Loading...</p></div></td></tr></tbody></table>
       </div>
     </div>
 
-    <!-- EXTEND -->
+    <!-- SEARCH & MANAGE -->
     <div class="section-page" id="page-extend">
-      <div class="page-header"><h2>Extend Ads</h2><p>Find a user by email, then find and extend their vehicle ads</p></div>
+      <div class="page-header"><h2>Search &amp; Manage</h2><p>Find user by email, see their ads, extend or add to home</p></div>
       <div class="extend-panel">
-        <h3><i class="fas fa-clock-rotate-left"></i> Extend by Email</h3>
-        <div class="desc">Type the user's email. The system will find their account in the Users table, get their UID, then find all vehicle ads belonging to that UID. You can extend each ad to any number of days you want.</div>
+        <h3><i class="fas fa-magnifying-glass"></i> Search by Email</h3>
+        <div class="desc">Type the user's email. System finds their UID from the Users table, then finds all vehicle ads matching that UID. You can Extend (+15 days) or Add to Home for each ad.</div>
         <div class="extend-search-row">
           <input type="email" class="extend-input" id="extendEmailInput" placeholder="user@example.com" onkeydown="if(event.key==='Enter')searchByEmail()">
           <button class="extend-btn" onclick="searchByEmail()"><i class="fas fa-search"></i> Search</button>
@@ -264,30 +265,44 @@
       <div class="page-header"><h2>Users</h2><p>Registered user accounts on Car Mart</p></div>
       <div class="data-table-wrap">
         <div class="table-header"><h3>All Users <span style="color:var(--text-muted);font-weight:400;font-size:13px;margin-left:8px;" id="userCount"></span></h3><input type="text" class="search-box" placeholder="Search users..." id="userSearch" oninput="renderUsers()"></div>
-        <table class="data-table"><thead><tr><th>User</th><th>Email</th><th>UID</th><th>Joined</th><th>Actions</th></tr></thead><tbody id="userBody"><tr><td colspan="5"><div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Loading...</p></div></td></tr></tbody></table>
-      </div>
-    </div>
-
-    <!-- CART -->
-    <div class="section-page" id="page-cart">
-      <div class="page-header"><h2>My Cart</h2><p>Items currently in users' shopping carts</p></div>
-      <div class="data-table-wrap">
-        <div class="table-header"><h3>Cart Items <span style="color:var(--text-muted);font-weight:400;font-size:13px;margin-left:8px;" id="cartCount"></span></h3></div>
-        <table class="data-table"><thead><tr><th>Item</th><th>User</th><th>Price</th><th>Added</th><th>Actions</th></tr></thead><tbody id="cartBody"><tr><td colspan="5"><div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Loading...</p></div></td></tr></tbody></table>
+        <table class="data-table"><thead><tr><th>User</th><th>Email</th><th>UID</th><th>Joined</th></tr></thead><tbody id="userBody"><tr><td colspan="4"><div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Loading...</p></div></td></tr></tbody></table>
       </div>
     </div>
 
     <!-- SETTINGS -->
     <div class="section-page" id="page-settings">
-      <div class="page-header"><h2>Settings</h2><p>Admin panel configuration</p></div>
+      <div class="page-header"><h2>Settings</h2><p>Admin panel configuration — saved to Firebase</p></div>
       <div class="data-table-wrap" style="padding:24px;">
-        <div style="display:grid;gap:20px;max-width:500px;">
-          <div><label style="font-size:13px;font-weight:600;display:block;margin-bottom:6px;">Default Auto-Delete Period (days)</label><input type="number" id="deleteDays" value="15" min="1" max="365" style="background:var(--bg-main);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-family:'JetBrains Mono',monospace;font-size:14px;width:120px;outline:none;" onchange="DELETE_PERIOD_DAYS=Math.max(1,Math.min(365,parseInt(this.value)||15));showToast('Auto-delete set to '+DELETE_PERIOD_DAYS+' days','info');renderVehicles();renderDashboardVehicles();"><p style="font-size:11px;color:var(--text-muted);margin-top:4px;">Vehicle ads auto-delete after this many days</p></div>
-          <div style="padding-top:12px;border-top:1px solid var(--border);"><label style="font-size:13px;font-weight:600;display:block;margin-bottom:6px;">Firebase Connection</label><div style="display:flex;align-items:center;gap:8px;"><span class="status-dot" style="display:inline-block;"></span><span style="font-size:13px;color:var(--success);">Connected &amp; Authenticated</span></div></div>
-          <div style="padding-top:12px;border-top:1px solid var(--border);"><label style="font-size:13px;font-weight:600;display:block;margin-bottom:6px;">Danger Zone</label><button class="btn btn-danger" onclick="confirmPurge()"><i class="fas fa-trash"></i> Purge Expired Vehicles Now</button></div>
+        <div style="max-width:500px;">
+          <div class="settings-row">
+            <label>Auto-Delete Period</label>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <input type="number" class="settings-input" id="deleteDaysInput" value="15" min="1" max="365" onchange="saveSetting('deletePeriodDays',parseInt(this.value)||15)">
+              <span style="font-size:13px;color:var(--text-secondary);">days</span>
+              <span class="saved-indicator" id="saveInd1"><i class="fas fa-check"></i> Saved</span>
+            </div>
+            <div class="hint">Ads auto-delete after this many days from their <strong>timestamp</strong></div>
+          </div>
+          <div class="settings-divider"></div>
+          <div class="settings-row">
+            <label>Extend Adds</label>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <input type="number" class="settings-input" id="extendDaysInput" value="15" min="1" max="365" onchange="saveSetting('extendPeriodDays',parseInt(this.value)||15)">
+              <span style="font-size:13px;color:var(--text-secondary);">days</span>
+              <span class="saved-indicator" id="saveInd2"><i class="fas fa-check"></i> Saved</span>
+            </div>
+            <div class="hint">Extend button adds this many days to the <strong>timestamp</strong></div>
+          </div>
+          <div class="settings-divider"></div>
+          <div class="settings-row"><label>Saved in Firebase</label><div class="settings-debug" id="settingsDebugInfo">Loading...</div></div>
+          <div class="settings-divider"></div>
+          <div class="settings-row"><label>Firebase Connection</label><div style="display:flex;align-items:center;gap:8px;"><span class="status-dot" style="display:inline-block;"></span><span style="font-size:13px;color:var(--success);">Connected</span></div></div>
+          <div class="settings-divider"></div>
+          <div class="settings-row"><label>Danger Zone</label><button class="btn btn-danger" onclick="confirmPurge()"><i class="fas fa-trash"></i> Purge Expired Now</button></div>
         </div>
       </div>
     </div>
+
   </main>
 </div>
 </div>
@@ -298,269 +313,217 @@
   firebase.initializeApp(firebaseConfig);
   const db=firebase.database(),auth=firebase.auth();
 
-  let vehiclesData={},usersData={},cartData={};
+  let vehiclesData={},usersData={},settingsData={};
   let DELETE_PERIOD_DAYS=15;
+  let EXTEND_PERIOD_DAYS=15;
   let countdownInterval=null,autoDeleteInterval=null;
   let isAdmin=false,listenersAttached=false;
+  const MS_PER_DAY=86400000;
 
-  function showToast(msg,type='info'){const c=document.getElementById('toastContainer');const icons={success:'fa-check-circle',danger:'fa-exclamation-circle',info:'fa-info-circle',extend:'fa-clock-rotate-left'};const t=document.createElement('div');t.className=`toast toast-${type}`;t.innerHTML=`<i class="fas ${icons[type]||icons.info}"></i><span>${msg}</span>`;c.appendChild(t);setTimeout(()=>{t.classList.add('removing');setTimeout(()=>t.remove(),300);},3500);}
+  // ============================================
+  // Toast
+  // ============================================
+  function showToast(msg,type='info'){const c=document.getElementById('toastContainer');const icons={success:'fa-check-circle',danger:'fa-exclamation-circle',info:'fa-info-circle',extend:'fa-clock-rotate-left',home:'fa-house'};const t=document.createElement('div');t.className=`toast toast-${type}`;t.innerHTML=`<i class="fas ${icons[type]||icons.info}"></i><span>${msg}</span>`;c.appendChild(t);setTimeout(()=>{t.classList.add('removing');setTimeout(()=>t.remove(),300);},3500);}
 
-  /* ========== AUTH ========== */
-  function doLogin(){
-    const email=document.getElementById('loginEmail').value.trim(),pass=document.getElementById('loginPassword').value;
-    const btn=document.getElementById('loginBtn'),errEl=document.getElementById('loginError'),errMsg=document.getElementById('loginErrorMsg');
-    if(!email||!pass){errMsg.textContent='Please enter email and password';errEl.classList.add('show');return;}
-    btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Signing in...';errEl.classList.remove('show');
-    auth.signInWithEmailAndPassword(email,pass).then(cred=>{
-      const uid=cred.user.uid;
-      return db.ref('admins/'+uid).once('value').then(snap=>{
-        if(snap.exists()){isAdmin=true;enterAdminPanel(cred.user);}
-        else{auth.signOut();errMsg.innerHTML='Not an admin. Add this UID to <code>admins</code> node:<br><strong style="color:var(--accent);word-break:break-all;font-family:JetBrains Mono,monospace;font-size:12px;">'+uid+'</strong>';errEl.classList.add('show');btn.disabled=false;btn.innerHTML='<i class="fas fa-right-to-bracket"></i> Sign In';}
-      });
-    }).catch(err=>{
-      const m={'auth/user-not-found':'No account found','auth/wrong-password':'Incorrect password','auth/invalid-email':'Invalid email','auth/too-many-requests':'Too many attempts','auth/invalid-credential':'Invalid email or password'};
-      errMsg.textContent=m[err.code]||err.message;errEl.classList.add('show');btn.disabled=false;btn.innerHTML='<i class="fas fa-right-to-bracket"></i> Sign In';
-    });
-  }
+  // ============================================
+  // Settings (Firebase Persistent)
+  // ============================================
+  function saveSetting(key,value){value=Math.max(1,Math.min(365,value));const updates={};updates[key]=value;db.ref('settings').update(updates).then(()=>{showToast(`Saved: ${key} = ${value}`,'success');const ind=key==='deletePeriodDays'?document.getElementById('saveInd1'):document.getElementById('saveInd2');if(ind){ind.classList.add('show');setTimeout(()=>ind.classList.remove('show'),2000);}}).catch(e=>showToast('Save failed: '+e.message,'danger'));}
+
+  function applySettings(data){settingsData=data||{};if(settingsData.deletePeriodDays)DELETE_PERIOD_DAYS=Math.max(1,Math.min(365,settingsData.deletePeriodDays));if(settingsData.extendPeriodDays)EXTEND_PERIOD_DAYS=Math.max(1,Math.min(365,settingsData.extendPeriodDays));const dI=document.getElementById('deleteDaysInput'),eI=document.getElementById('extendDaysInput');if(dI)dI.value=DELETE_PERIOD_DAYS;if(eI)eI.value=EXTEND_PERIOD_DAYS;const dbg=document.getElementById('settingsDebugInfo');if(dbg){dbg.innerHTML=Object.keys(settingsData).length?Object.entries(settingsData).map(([k,v])=>`${k}: <strong>${v}</strong>`).join('<br>'):'Using defaults';}renderVehicles();renderDashboardVehicles();}
+
+  // ============================================
+  // Auth
+  // ============================================
+  function doLogin(){const email=document.getElementById('loginEmail').value.trim(),pass=document.getElementById('loginPassword').value;const btn=document.getElementById('loginBtn'),errEl=document.getElementById('loginError'),errMsg=document.getElementById('loginErrorMsg');if(!email||!pass){errMsg.textContent='Please enter email and password';errEl.classList.add('show');return;}btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Signing in...';errEl.classList.remove('show');auth.signInWithEmailAndPassword(email,pass).then(cred=>{const uid=cred.user.uid;return db.ref('admins/'+uid).once('value').then(snap=>{if(snap.exists()){isAdmin=true;enterAdminPanel(cred.user);}else{auth.signOut();errMsg.innerHTML='Not admin. Add UID to <code>admins</code>:<br><strong style="color:var(--accent);word-break:break-all;font-family:JetBrains Mono,monospace;font-size:12px;">'+uid+'</strong>';errEl.classList.add('show');btn.disabled=false;btn.innerHTML='<i class="fas fa-right-to-bracket"></i> Sign In';}});}).catch(err=>{const m={'auth/user-not-found':'No account found','auth/wrong-password':'Wrong password','auth/invalid-email':'Invalid email','auth/too-many-requests':'Too many attempts','auth/invalid-credential':'Invalid email or password'};errMsg.textContent=m[err.code]||err.message;errEl.classList.add('show');btn.disabled=false;btn.innerHTML='<i class="fas fa-right-to-bracket"></i> Sign In';});}
   function doLogout(){auth.signOut().then(()=>{listenersAttached=false;document.getElementById('adminPanel').style.display='none';document.getElementById('loginScreen').style.display='flex';});}
   function enterAdminPanel(user){document.getElementById('loginScreen').style.display='none';document.getElementById('adminPanel').style.display='block';document.getElementById('userBarEmail').textContent=user.email;showToast('Welcome, admin!','success');attachListeners();startCountdownTick();startAutoDeleteCheck();}
   auth.onAuthStateChanged(user=>{if(user&&!isAdmin){db.ref('admins/'+user.uid).once('value').then(snap=>{if(snap.exists()){isAdmin=true;enterAdminPanel(user);}else{auth.signOut();}});}});
 
-  /* ========== NAV ========== */
+  // ============================================
+  // Navigation
+  // ============================================
   function switchPage(page){document.querySelectorAll('.section-page').forEach(el=>el.classList.remove('active'));document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));const p=document.getElementById('page-'+page),n=document.querySelector(`.nav-item[data-page="${page}"]`);if(p)p.classList.add('active');if(n)n.classList.add('active');document.getElementById('sidebar').classList.remove('open');}
 
-  /* ========== COUNTDOWN ========== */
-  const MS_PER_DAY=86400000;
-  function getExpiryTs(v){if(v.expiresAt&&typeof v.expiresAt==='number')return v.expiresAt;const a=v.addedAt||v.timestamp||v.createdAt||0;if(!a)return Date.now()+DELETE_PERIOD_DAYS*MS_PER_DAY;return(typeof a==='number'?a:new Date(a).getTime())+DELETE_PERIOD_DAYS*MS_PER_DAY;}
-  function getRemainingMs(v){return getExpiryTs(v)-Date.now();}
+  // ============================================
+  // Countdown — based on `timestamp` field
+  // ============================================
+  // Expiry = timestamp + DELETE_PERIOD_DAYS
+  // Extend = adds EXTEND_PERIOD_DAYS to timestamp
+  function getVehicleTimestamp(v){return v.timestamp||v.addedAt||v.createdAt||0;}
+  function getExpiryMs(v){const ts=getVehicleTimestamp(v);if(!ts)return Date.now()+DELETE_PERIOD_DAYS*MS_PER_DAY;return ts+DELETE_PERIOD_DAYS*MS_PER_DAY;}
+  function getRemainingMs(v){return getExpiryMs(v)-Date.now();}
   function formatCountdown(ms){if(ms<=0)return'00:00:00:00';const d=Math.floor(ms/MS_PER_DAY),h=Math.floor((ms%MS_PER_DAY)/3600000),m=Math.floor((ms%3600000)/60000),s=Math.floor((ms%60000)/1000);return`${String(d).padStart(2,'0')}:${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;}
   function getCountdownPercent(ms){return Math.max(0,Math.min(100,(ms/(DELETE_PERIOD_DAYS*MS_PER_DAY))*100));}
   function getStatus(ms){const d=ms/MS_PER_DAY;if(d<=0)return'expired';if(d<=3)return'expiring';return'active';}
-  function isVehicleExtended(v){return!!v.expiresAt;}
+  function isVehicleExtended(v){const ts=getVehicleTimestamp(v);const originalTs=v.timestamp||0;if(!originalTs)return false;return ts>originalTs;}
   function getStatusBadge(status,ext){if(ext)return'<span class="badge badge-extended"><i class="fas fa-arrows-rotate" style="font-size:8px"></i> Extended</span>';const m={active:'<span class="badge badge-active"><i class="fas fa-circle" style="font-size:6px"></i> Active</span>',expiring:'<span class="badge badge-expiring"><i class="fas fa-circle" style="font-size:6px"></i> Expiring</span>',expired:'<span class="badge badge-expired"><i class="fas fa-circle" style="font-size:6px"></i> Expired</span>'};return m[status]||m.active;}
   function getCountdownColor(ms,ext){if(ext){if(ms/MS_PER_DAY<=0)return'var(--danger)';return'var(--extend)';}const d=ms/MS_PER_DAY;if(d<=0)return'var(--danger)';if(d<=3)return'var(--accent)';return'var(--success)';}
 
-  /* ========== HELPERS ========== */
+  // Home countdown
+  function getHomeRemainingMs(v){if(!v.timestamphome)return 0;return v.timestamphome-Date.now();}
+  function formatHomeCountdown(ms){if(ms<=0)return'Expired';const d=Math.floor(ms/MS_PER_DAY),h=Math.floor((ms%MS_PER_DAY)/3600000),m=Math.floor((ms%3600000)/60000);return`${d}d ${h}h ${m}m`;}
+
+  // ============================================
+  // Helpers
+  // ============================================
   function getVehicleImage(v){if(v.imageUrl)return`<img src="${v.imageUrl}" alt="" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-car\\'></i>'">`;return'<i class="fas fa-car"></i>';}
-  function getVehicleName(v){return v.name||v.title||v.vehicleName||`${v.brand||''} ${v.model||''}`.trim()||'Unnamed Vehicle';}
+  function getVehicleName(v){return v.name||v.title||v.vehicleName||`${v.brand||''} ${v.model||''}`.trim()||'Unnamed';}
   function getVehiclePrice(v){const p=v.price||v.cost||0;return typeof p==='number'?'Rs. '+p.toLocaleString():p||'—';}
   function formatDate(ts){if(!ts)return'—';const d=new Date(typeof ts==='number'?ts:ts);if(isNaN(d.getTime()))return'—';return d.toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'});}
   function getUserInitial(n){return(n||'U').charAt(0).toUpperCase();}
-
-  // Get UID from a vehicle — check ALL possible field names
   function getVehicleOwnerId(v){return v.userId||v.uid||v.ownerId||v.sellerId||v.user_uid||v.postedBy||v.createdBy||'';}
 
-  /* ========== RENDER VEHICLES ========== */
+  // ============================================
+  // Render: Vehicles
+  // ============================================
   function renderVehicles(){
     const s=(document.getElementById('vehicleSearch')?.value||'').toLowerCase();
     const entries=Object.entries(vehiclesData).filter(([id,v])=>getVehicleName(v).toLowerCase().includes(s)||getVehicleOwnerId(v).toLowerCase().includes(s));
     document.getElementById('vehicleCount').textContent=`(${entries.length})`;
     const tbody=document.getElementById('vehicleBody');
-    if(!entries.length){tbody.innerHTML=`<tr><td colspan="6"><div class="empty-state"><i class="fas fa-car-side"></i><p>No vehicles found</p></div></td></tr>`;return;}
+    if(!entries.length){tbody.innerHTML=`<tr><td colspan="6"><div class="empty-state"><i class="fas fa-car-side"></i><p>No vehicles</p></div></td></tr>`;return;}
     tbody.innerHTML=entries.map(([id,v])=>{
-      const name=getVehicleName(v),price=getVehiclePrice(v),addedAt=v.addedAt||v.timestamp||v.createdAt||0;
-      const remaining=getRemainingMs(v),status=getStatus(remaining),extended=isVehicleExtended(v);
+      const name=getVehicleName(v),price=getVehiclePrice(v),remaining=getRemainingMs(v),status=getStatus(remaining),extended=isVehicleExtended(v);
       const pct=getCountdownPercent(remaining),color=getCountdownColor(remaining,extended),formatted=formatCountdown(remaining);
-      const periodLabel=extended?'extended':'default';
-      const ownerUid=getVehicleOwnerId(v);
-      return`<tr><td><div class="vehicle-cell"><div class="vehicle-thumb">${getVehicleImage(v)}</div><div><div style="font-weight:600;">${name}</div><div style="font-size:11px;color:var(--text-muted);">${ownerUid?'UID: '+ownerUid:id}</div></div></div></td><td><span class="price">${price}</span></td><td style="font-size:13px;color:var(--text-secondary);">${formatDate(addedAt)}</td><td>${getStatusBadge(status,extended)}</td><td><div class="countdown-cell"><span class="countdown-text" style="color:${color};" data-countdown-id="${id}">${formatted}</span><div class="countdown-bar"><div class="countdown-bar-fill" style="width:${pct}%;background:${color};" data-countdown-bar="${id}"></div></div></div><div class="auto-delete-label">${periodLabel}</div></td><td><div style="display:flex;gap:6px;flex-wrap:wrap;">${!extended?`<button class="btn btn-extend" onclick="extendVehicle('${id}',30)"><i class="fas fa-arrows-rotate"></i> +30d</button>`:''}<button class="btn btn-danger" onclick="confirmDeleteVehicle('${id}','${name.replace(/'/g,"\\'")}')"><i class="fas fa-trash"></i></button></div></td></tr>`;
+      const isHome=!!v.home,ownerUid=getVehicleOwnerId(v);
+      const homeBadge=isHome?'<span class="badge badge-home"><i class="fas fa-house" style="font-size:8px"></i> Home</span>':'<span style="color:var(--text-muted);font-size:11px;">No</span>';
+      return`<tr><td><div class="vehicle-cell"><div class="vehicle-thumb">${getVehicleImage(v)}</div><div><div style="font-weight:600;">${name}</div><div style="font-size:11px;color:var(--text-muted);">${ownerUid?'UID: '+ownerUid:id}</div></div></div></td><td><span class="price">${price}</span></td><td>${getStatusBadge(status,extended)}</td><td><div class="countdown-cell"><span class="countdown-text" style="color:${color};" data-countdown-id="${id}">${formatted}</span><div class="countdown-bar"><div class="countdown-bar-fill" style="width:${pct}%;background:${color};" data-countdown-bar="${id}"></div></div></div></td><td>${homeBadge}</td><td><button class="btn btn-danger" onclick="confirmDeleteVehicle('${id}','${name.replace(/'/g,"\\'")}')"><i class="fas fa-trash"></i></button></td></tr>`;
     }).join('');
   }
 
-  /* ========== DASHBOARD ========== */
+  // ============================================
+  // Render: Dashboard
+  // ============================================
   function renderDashboardVehicles(){
-    const entries=Object.entries(vehiclesData).sort((a,b)=>((b[1].addedAt||b[1].timestamp||b[1].createdAt||0)-(a[1].addedAt||a[1].timestamp||a[1].createdAt||0))).slice(0,5);
+    const entries=Object.entries(vehiclesData).sort((a,b)=>(getVehicleTimestamp(b[1])-getVehicleTimestamp(a[1]))).slice(0,5);
     const tbody=document.getElementById('dashVehicleBody');
-    if(!entries.length){tbody.innerHTML=`<tr><td colspan="4"><div class="empty-state"><i class="fas fa-car-side"></i><p>No vehicles yet</p></div></td></tr>`;return;}
+    if(!entries.length){tbody.innerHTML=`<tr><td colspan="4"><div class="empty-state"><i class="fas fa-car-side"></i><p>No vehicles</p></div></td></tr>`;return;}
     tbody.innerHTML=entries.map(([id,v])=>{
       const name=getVehicleName(v),price=getVehiclePrice(v),remaining=getRemainingMs(v),status=getStatus(remaining),extended=isVehicleExtended(v),color=getCountdownColor(remaining,extended),formatted=formatCountdown(remaining);
       return`<tr><td><div class="vehicle-cell"><div class="vehicle-thumb">${getVehicleImage(v)}</div><span style="font-weight:600;">${name}</span></div></td><td><span class="price">${price}</span></td><td>${getStatusBadge(status,extended)}</td><td><span class="countdown-text" style="color:${color};" data-countdown-id="dash-${id}">${formatted}</span></td></tr>`;
     }).join('');
   }
 
-  /* ========== USERS ========== */
+  // ============================================
+  // Render: Users
+  // ============================================
   function renderUsers(){
     const s=(document.getElementById('userSearch')?.value||'').toLowerCase();
     const entries=Object.entries(usersData).filter(([id,u])=>{const n=(u.name||u.displayName||u.username||'').toLowerCase();const e=(u.email||'').toLowerCase();return n.includes(s)||e.includes(s)||id.toLowerCase().includes(s);});
     document.getElementById('userCount').textContent=`(${entries.length})`;
     const tbody=document.getElementById('userBody');
-    if(!entries.length){tbody.innerHTML=`<tr><td colspan="5"><div class="empty-state"><i class="fas fa-users"></i><p>No users found</p></div></td></tr>`;return;}
-    tbody.innerHTML=entries.map(([id,u])=>{
-      const name=u.name||u.displayName||u.username||'Unknown',email=u.email||'—',joined=u.createdAt||u.joinedAt||u.timestamp||0;
-      return`<tr><td><div class="user-cell"><div class="avatar">${getUserInitial(name)}</div><div><div style="font-weight:600;">${name}</div></div></div></td><td style="font-size:13px;color:var(--text-secondary);">${email}</td><td style="font-size:11px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;">${id}</td><td style="font-size:13px;color:var(--text-secondary);">${formatDate(joined)}</td><td><button class="btn btn-danger" onclick="confirmDeleteUser('${id}','${name.replace(/'/g,"\\'")}')"><i class="fas fa-trash"></i></button></td></tr>`;
-    }).join('');
+    if(!entries.length){tbody.innerHTML=`<tr><td colspan="4"><div class="empty-state"><i class="fas fa-users"></i><p>No users</p></div></td></tr>`;return;}
+    tbody.innerHTML=entries.map(([id,u])=>{const name=u.name||u.displayName||u.username||'Unknown',email=u.email||'—',joined=u.createdAt||u.joinedAt||u.timestamp||0;return`<tr><td><div class="user-cell"><div class="avatar">${getUserInitial(name)}</div><div><div style="font-weight:600;">${name}</div></div></div></td><td style="font-size:13px;color:var(--text-secondary);">${email}</td><td style="font-size:11px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;">${id}</td><td style="font-size:13px;color:var(--text-secondary);">${formatDate(joined)}</td></tr>`;}).join('');
   }
 
-  /* ========== CART ========== */
-  function renderCart(){
-    const entries=Object.entries(cartData);
-    document.getElementById('cartCount').textContent=`(${entries.length})`;
-    const tbody=document.getElementById('cartBody');
-    if(!entries.length){tbody.innerHTML=`<tr><td colspan="5"><div class="empty-state"><i class="fas fa-shopping-cart"></i><p>No cart items</p></div></td></tr>`;return;}
-    tbody.innerHTML=entries.map(([id,item])=>{
-      const itemName=item.vehicleName||item.name||item.title||'Unknown Item',userName=item.userName||item.userEmail||'—',price=item.price?'Rs. '+Number(item.price).toLocaleString():'—',added=item.addedAt||item.timestamp||0;
-      return`<tr><td style="font-weight:600;">${itemName}</td><td style="font-size:13px;color:var(--text-secondary);">${userName}</td><td><span class="price">${price}</span></td><td style="font-size:13px;color:var(--text-secondary);">${formatDate(added)}</td><td><button class="btn btn-danger" onclick="confirmDeleteCartItem('${id}','${itemName.replace(/'/g,"\\'")}')"><i class="fas fa-trash"></i></button></td></tr>`;
-    }).join('');
-  }
-
-  /* ========== STATS ========== */
+  // ============================================
+  // Stats
+  // ============================================
   function updateStats(){
-    const vc=Object.keys(vehiclesData).length,uc=Object.keys(usersData).length,cc=Object.keys(cartData).length;
-    let exp=0,ext=0;
-    Object.values(vehiclesData).forEach(v=>{const r=getRemainingMs(v);if(r>0&&r/MS_PER_DAY<=3)exp++;if(isVehicleExtended(v))ext++;});
-    document.getElementById('statVehicles').textContent=vc;document.getElementById('statUsers').textContent=uc;document.getElementById('statCart').textContent=cc;document.getElementById('statExpiring').textContent=exp;document.getElementById('statExtended').textContent=ext;
-    document.getElementById('vehicleBadge').textContent=vc;document.getElementById('userBadge').textContent=uc;document.getElementById('cartBadge').textContent=cc;
+    const vc=Object.keys(vehiclesData).length,uc=Object.keys(usersData).length;
+    let exp=0,ext=0,home=0;
+    Object.values(vehiclesData).forEach(v=>{const r=getRemainingMs(v);if(r>0&&r/MS_PER_DAY<=3)exp++;if(isVehicleExtended(v))ext++;if(v.home)home++;});
+    document.getElementById('statVehicles').textContent=vc;document.getElementById('statUsers').textContent=uc;document.getElementById('statExpiring').textContent=exp;document.getElementById('statExtended').textContent=ext;document.getElementById('statHome').textContent=home;
+    document.getElementById('vehicleBadge').textContent=vc;document.getElementById('userBadge').textContent=uc;
   }
 
-  /* ========== TICK ========== */
-  function startCountdownTick(){if(countdownInterval)clearInterval(countdownInterval);countdownInterval=setInterval(()=>{document.querySelectorAll('[data-countdown-id]').forEach(el=>{const id=el.getAttribute('data-countdown-id').replace('dash-',''),v=vehiclesData[id];if(!v)return;const r=getRemainingMs(v);el.textContent=formatCountdown(r);el.style.color=getCountdownColor(r,isVehicleExtended(v));});document.querySelectorAll('[data-countdown-bar]').forEach(el=>{const id=el.getAttribute('data-countdown-bar'),v=vehiclesData[id];if(!v)return;const r=getRemainingMs(v);el.style.width=getCountdownPercent(r)+'%';el.style.background=getCountdownColor(r,isVehicleExtended(v));});updateExtendCountdowns();},1000);}
-  function startAutoDeleteCheck(){if(autoDeleteInterval)clearInterval(autoDeleteInterval);autoDeleteInterval=setInterval(()=>purgeExpired(false),60000);}
-  function purgeExpired(showMsg=true){const toDel=[];Object.entries(vehiclesData).forEach(([id,v])=>{if(getRemainingMs(v)<=0)toDel.push({id,name:getVehicleName(v)});});if(!toDel.length){if(showMsg)showToast('No expired vehicles to purge','info');return;}const updates={};toDel.forEach(({id})=>updates[id]=null);db.ref('vehicles').update(updates).then(()=>showToast(`Auto-deleted ${toDel.length} expired vehicle${toDel.length>1?'s':''}`,'danger')).catch(e=>showToast('Auto-delete failed: '+e.message,'danger'));}
+  // ============================================
+  // Countdown Tick
+  // ============================================
+  function startCountdownTick(){if(countdownInterval)clearInterval(countdownInterval);countdownInterval=setInterval(()=>{document.querySelectorAll('[data-countdown-id]').forEach(el=>{const id=el.getAttribute('data-countdown-id').replace('dash-',''),v=vehiclesData[id];if(!v)return;const r=getRemainingMs(v);el.textContent=formatCountdown(r);el.style.color=getCountdownColor(r,isVehicleExtended(v));});document.querySelectorAll('[data-countdown-bar]').forEach(el=>{const id=el.getAttribute('data-countdown-bar'),v=vehiclesData[id];if(!v)return;const r=getRemainingMs(v);el.style.width=getCountdownPercent(r)+'%';el.style.background=getCountdownColor(r,isVehicleExtended(v));});document.querySelectorAll('[data-home-countdown]').forEach(el=>{const id=el.getAttribute('data-home-countdown'),v=vehiclesData[id];if(!v)return;el.textContent=formatHomeCountdown(getHomeRemainingMs(v));});},1000);}
 
-  /* ========== EXTEND ========== */
-  function extendVehicle(id,days){
+  // ============================================
+  // Auto-Delete
+  // ============================================
+  function startAutoDeleteCheck(){if(autoDeleteInterval)clearInterval(autoDeleteInterval);autoDeleteInterval=setInterval(()=>purgeExpired(false),60000);}
+  function purgeExpired(showMsg=true){const toDel=[];Object.entries(vehiclesData).forEach(([id,v])=>{if(getRemainingMs(v)<=0)toDel.push({id,name:getVehicleName(v)});});if(!toDel.length){if(showMsg)showToast('No expired vehicles','info');return;}const updates={};toDel.forEach(({id})=>updates[id]=null);db.ref('vehicles').update(updates).then(()=>showToast(`Deleted ${toDel.length} expired ad${toDel.length>1?'s':''}`,'danger')).catch(e=>showToast('Purge failed: '+e.message,'danger'));}
+
+  // ============================================
+  // EXTEND: adds EXTEND_PERIOD_DAYS to timestamp
+  // ============================================
+  function extendVehicle(id){
     const v=vehiclesData[id];if(!v)return;
-    days=Math.max(1,Math.min(365,days||30));
-    db.ref('vehicles/'+id).update({expiresAt:Date.now()+days*MS_PER_DAY,extendedAt:Date.now(),extendedDays:days})
-      .then(()=>showToast(`"${getVehicleName(v)}" extended to ${days} days`,'extend'))
+    const currentTs=getVehicleTimestamp(v);
+    const newTs=currentTs+(EXTEND_PERIOD_DAYS*MS_PER_DAY);
+    db.ref('vehicles/'+id).update({timestamp:newTs})
+      .then(()=>showToast(`"${getVehicleName(v)}" extended by +${EXTEND_PERIOD_DAYS} days`,'extend'))
       .catch(e=>showToast('Extend failed: '+e.message,'danger'));
   }
-  function extendMultipleVehicles(ids,days){
-    days=Math.max(1,Math.min(365,days||30));
-    const updates={},exp=Date.now()+days*MS_PER_DAY,ext=Date.now();
-    ids.forEach(id=>{updates[`${id}/expiresAt`]=exp;updates[`${id}/extendedAt`]=ext;updates[`${id}/extendedDays`]=days;});
-    db.ref('vehicles').update(updates).then(()=>showToast(`${ids.length} vehicle${ids.length>1?'s':''} extended to ${days} days`,'extend')).catch(e=>showToast('Bulk extend failed: '+e.message,'danger'));
+
+  // ============================================
+  // ADD TO HOME: toggle home boolean, set timestamphome
+  // ============================================
+  function toggleHome(id,days){
+    const v=vehiclesData[id];if(!v)return;
+    const isHome=!!v.home;
+    if(isHome){
+      // Turn OFF
+      db.ref('vehicles/'+id).update({home:false,timestamphome:null})
+        .then(()=>showToast(`"${getVehicleName(v)}" removed from Home`,'info'))
+        .catch(e=>showToast('Failed: '+e.message,'danger'));
+    } else {
+      // Turn ON with chosen days
+      const timestamphome=Date.now()+(days*MS_PER_DAY);
+      db.ref('vehicles/'+id).update({home:true,timestamphome:timestamphome})
+        .then(()=>showToast(`"${getVehicleName(v)}" added to Home for ${days} days`,'home'))
+        .catch(e=>showToast('Failed: '+e.message,'danger'));
+    }
   }
 
-  /* ========== SEARCH BY EMAIL — FIXED LOGIC ========== */
+  // ============================================
+  // Search by Email
+  // ============================================
   function searchByEmail(){
     const email=document.getElementById('extendEmailInput').value.trim().toLowerCase();
-    if(!email){showToast('Please enter an email address','info');return;}
+    if(!email){showToast('Enter an email','info');return;}
     const rc=document.getElementById('extendResults');
-    rc.innerHTML=`<div class="extend-results"><div style="text-align:center;padding:30px;color:var(--text-muted);"><i class="fas fa-spinner fa-spin" style="font-size:24px;margin-bottom:8px;display:block;"></i>Searching...</div></div>`;
+    rc.innerHTML=`<div class="extend-results"><div style="text-align:center;padding:30px;color:var(--text-muted);"><i class="fas fa-spinner fa-spin" style="font-size:24px;display:block;margin-bottom:8px;"></i>Searching...</div></div>`;
 
-    // STEP 1: Find user UID(s) from the users table by email
-    const matchedUids = [];
-    const matchedUserInfo = {};
-    Object.entries(usersData).forEach(([uid, u]) => {
-      const uEmail = (u.email || '').toLowerCase();
-      if (uEmail === email) {
-        matchedUids.push(uid);
-        matchedUserInfo[uid] = u;
-      }
-    });
+    // Step 1: Find UID from users table
+    const matchedUids=[],matchedUserInfo={};
+    Object.entries(usersData).forEach(([uid,u])=>{if((u.email||'').toLowerCase()===email){matchedUids.push(uid);matchedUserInfo[uid]=u;}});
 
-    // STEP 2: Find vehicles belonging to those UIDs
-    // Also check vehicles that directly contain the email
-    const matches = [];
-    const matchIds = new Set();
+    // Step 2: Find vehicles by UID
+    const matches=[],matchIds=new Set();
+    matchedUids.forEach(uid=>{Object.entries(vehiclesData).forEach(([vid,v])=>{if(matchIds.has(vid))return;if(getVehicleOwnerId(v)===uid){matchIds.add(vid);matches.push({id:vid,...v,_ownerUid:uid});}});});
+    // Also check vehicles with email directly
+    Object.entries(vehiclesData).forEach(([vid,v])=>{if(matchIds.has(vid))return;const vEmail=(v.email||v.sellerEmail||v.userEmail||v.ownerEmail||'').toLowerCase();if(vEmail===email){matchIds.add(vid);matches.push({id:vid,...v,_ownerUid:getVehicleOwnerId(v)||'?'});}});
 
-    // 2a: Find vehicles by owner UID
-    matchedUids.forEach(uid => {
-      Object.entries(vehiclesData).forEach(([vid, v]) => {
-        if (matchIds.has(vid)) return;
-        const ownerId = getVehicleOwnerId(v);
-        if (ownerId === uid) {
-          matchIds.add(vid);
-          matches.push({ id: vid, ...v, _ownerUid: uid });
-        }
-      });
-    });
+    // Debug
+    let debugHtml='';
+    if(matchedUids.length>0){debugHtml=`<div class="debug-info"><i class="fas fa-check-circle" style="color:var(--success);margin-right:6px;"></i>Found in <strong>users</strong> table<br>`;matchedUids.forEach(uid=>{const u=matchedUserInfo[uid];debugHtml+=`UID: <strong>${uid}</strong> → ${u.name||u.displayName||u.username||'No name'}<br>`;});debugHtml+=`</div>`;}
+    else{debugHtml=`<div class="debug-info"><i class="fas fa-exclamation-triangle" style="color:var(--accent);margin-right:6px;"></i>No user with email <strong>${email}</strong> in users table</div>`;}
 
-    // 2b: Also check vehicles that have the email directly
-    Object.entries(vehiclesData).forEach(([vid, v]) => {
-      if (matchIds.has(vid)) return;
-      const vEmail = (v.email || v.sellerEmail || v.userEmail || v.ownerEmail || '').toLowerCase();
-      if (vEmail === email) {
-        matchIds.add(vid);
-        matches.push({ id: vid, ...v, _ownerUid: getVehicleOwnerId(v) || '?' });
-      }
-    });
+    if(!matches.length){rc.innerHTML=`<div class="extend-results">${debugHtml}<div class="empty-state" style="padding:40px 20px;"><i class="fas fa-search" style="font-size:36px;"></i><p>No ads for <strong style="color:var(--text-primary);">${email}</strong></p><p style="font-size:12px;margin-top:8px;">User has no ads, or ads don't have a matching <code>userId</code> field.</p></div></div>`;return;}
 
-    // Build debug info
-    let debugHtml = '';
-    if (matchedUids.length > 0) {
-      debugHtml = `<div class="debug-info"><i class="fas fa-check-circle" style="color:var(--success);margin-right:6px;"></i>Found user in <strong>users</strong> table<br>`;
-      matchedUids.forEach(uid => {
-        const u = matchedUserInfo[uid];
-        debugHtml += `UID: <strong>${uid}</strong> → ${u.name || u.displayName || u.username || 'No name'}<br>`;
-      });
-      debugHtml += `</div>`;
-    } else {
-      debugHtml = `<div class="debug-info"><i class="fas fa-exclamation-triangle" style="color:var(--accent);margin-right:6px;"></i>No user found in <strong>users</strong> table with email <strong>${email}</strong><br>Make sure the user is registered and their email is stored in the users node.</div>`;
-    }
-
-    // Render results
-    if (!matches.length) {
-      rc.innerHTML = `<div class="extend-results">
-        ${debugHtml}
-        <div class="empty-state" style="padding:40px 20px;">
-          <i class="fas fa-search" style="font-size:36px;"></i>
-          <p>No vehicle ads found for <strong style="color:var(--text-primary);">${email}</strong></p>
-          <p style="font-size:12px;margin-top:8px;">The user exists but has no vehicle ads yet, or the vehicle ads don't have a <code>userId</code> field linking to this user's UID.</p>
-        </div>
-      </div>`;
-      return;
-    }
-
-    const extIds = matches.filter(m => !m.expiresAt).map(m => m.id);
-
-    rc.innerHTML = `<div class="extend-results">
-      ${debugHtml}
-      <div class="extend-results-header">
-        <h4>Found ${matches.length} vehicle ad${matches.length>1?'s':''} for <span style="color:var(--accent);">${email}</span></h4>
-        <div style="display:flex;align-items:center;gap:10px;">
-          <div class="days-input-wrap">
-            <span class="days-label">Extend all to</span>
-            <input type="number" class="days-input" id="extendAllDays" value="30" min="1" max="365">
-            <span class="days-label">days</span>
-          </div>
-          ${extIds.length>0?`<button class="extend-all-btn" onclick="extendMultipleVehicles(${JSON.stringify(extIds)},parseInt(document.getElementById('extendAllDays').value)||30);setTimeout(()=>searchByEmail(),800);"><i class="fas fa-arrows-rotate"></i> Extend All</button>`:''}
-        </div>
-      </div>
-      ${matches.map(v => {
-        const id=v.id,name=getVehicleName(v),price=getVehiclePrice(v),addedAt=v.addedAt||v.timestamp||v.createdAt||0;
-        const remaining=getRemainingMs(v),status=getStatus(remaining),extended=isVehicleExtended(v);
-        const color=getCountdownColor(remaining,extended),formatted=formatCountdown(remaining);
-        const ownerUid=v._ownerUid||'';
-        return`<div class="extend-vehicle-card" data-extend-card="${id}">
-          <div class="vehicle-thumb">${getVehicleImage(v)}</div>
-          <div class="ev-info">
-            <div class="ev-name">${name}</div>
-            <div class="ev-meta">${price} &middot; Added ${formatDate(addedAt)} ${ownerUid?'&middot; Owner: <span style="color:var(--accent);">'+ownerUid+'</span>':''} ${extended?'<span class="extend-info-tag"><i class="fas fa-arrows-rotate" style="font-size:8px"></i> Extended</span>':''}</div>
-            <div class="ev-countdown" style="color:${color};" data-extend-countdown="${id}">${remaining>0?formatted:'EXPIRED'}</div>
-            <div class="ev-status">${getStatusBadge(status,extended)}</div>
-          </div>
-          <div class="ev-actions">
-            <div class="days-input-wrap" style="margin-bottom:4px;">
-              <input type="number" class="days-input" id="extendDays_${id}" value="30" min="1" max="365">
-              <span class="days-label">days</span>
-            </div>
-            <button class="btn btn-extend" onclick="extendVehicle('${id}',parseInt(document.getElementById('extendDays_${id}').value)||30);setTimeout(()=>searchByEmail(),800);"><i class="fas fa-arrows-rotate"></i> Extend</button>
-            <button class="btn btn-danger" onclick="confirmDeleteVehicle('${id}','${name.replace(/'/g,"\\'")}');setTimeout(()=>searchByEmail(),800);"><i class="fas fa-trash"></i></button>
-          </div>
-        </div>`;
-      }).join('')}
-    </div>`;
+    rc.innerHTML=`<div class="extend-results">${debugHtml}<div class="extend-results-header"><h4>${matches.length} ad${matches.length>1?'s':''} for <span style="color:var(--accent);">${email}</span></h4></div>${matches.map(v=>{const id=v.id,name=getVehicleName(v),price=getVehiclePrice(v),remaining=getRemainingMs(v),status=getStatus(remaining),extended=isVehicleExtended(v),color=getCountdownColor(remaining,extended),formatted=formatCountdown(remaining),isHome=!!v.home,ownerUid=v._ownerUid||'';const homeRemaining=isHome?getHomeRemainingMs(v):0;return`<div class="ev-card"><div class="ev-card-top"><div class="vehicle-thumb">${getVehicleImage(v)}</div><div class="ev-info"><div class="ev-name">${name}</div><div class="ev-meta">${price} &middot; Owner: <span style="color:var(--accent);">${ownerUid}</span> ${extended?'<span class="badge badge-extended" style="margin-left:6px;"><i class="fas fa-arrows-rotate" style="font-size:8px"></i> Extended</span>':''} ${isHome?'<span class="badge badge-home" style="margin-left:6px;"><i class="fas fa-house" style="font-size:8px"></i> Home</span>':''}</div><div class="ev-countdown" style="color:${color};" data-countdown-id="search-${id}">${remaining>0?formatted:'EXPIRED'}</div><div class="ev-status">${getStatusBadge(status,extended)}</div>${isHome?`<div style="font-size:11px;color:var(--home);margin-top:4px;"><i class="fas fa-house" style="font-size:9px;"></i> Home expires: <span data-home-countdown="${id}">${formatHomeCountdown(homeRemaining)}</span></div>`:''}</div></div><div class="ev-card-actions"><button class="btn btn-extend" onclick="extendVehicle('${id}');setTimeout(()=>searchByEmail(),800);"><i class="fas fa-arrows-rotate"></i> Extend +${EXTEND_PERIOD_DAYS}d</button>${isHome?`<button class="btn btn-home-on" onclick="toggleHome('${id}',0);setTimeout(()=>searchByEmail(),800);"><i class="fas fa-house-circle-xmark"></i> Remove from Home</button>`:`<button class="btn btn-home" onclick="showHomeDays('${id}')"><i class="fas fa-house"></i> Add to Home</button>`}<span id="homeDays_${id}"></span><button class="btn btn-danger" onclick="confirmDeleteVehicle('${id}','${name.replace(/'/g,"\\'")}');setTimeout(()=>searchByEmail(),800);"><i class="fas fa-trash"></i></button></div></div>`;}).join('')}</div>`;
   }
 
-  function updateExtendCountdowns(){document.querySelectorAll('[data-extend-countdown]').forEach(el=>{const id=el.getAttribute('data-extend-countdown'),v=vehiclesData[id];if(!v)return;const r=getRemainingMs(v);el.style.color=getCountdownColor(r,isVehicleExtended(v));el.textContent=r>0?formatCountdown(r):'EXPIRED';});}
+  // Show 7d / 14d options for Add to Home
+  function showHomeDays(id){
+    const container=document.getElementById('homeDays_'+id);
+    if(!container)return;
+    container.innerHTML=`<span class="home-days-popup"><span style="font-size:11px;color:var(--text-muted);margin-right:2px;">For:</span><button class="home-days-btn" style="background:var(--home-dim);color:var(--home);" onclick="toggleHome('${id}',7);setTimeout(()=>searchByEmail(),800);">7d</button><button class="home-days-btn" style="background:var(--home);color:#fff;" onclick="toggleHome('${id}',14);setTimeout(()=>searchByEmail(),800);">14d</button></span>`;
+  }
 
-  /* ========== MODALS ========== */
+  // ============================================
+  // Modals
+  // ============================================
   function showModal(title,msg,onConfirm){document.getElementById('modalContainer').innerHTML=`<div class="modal-overlay" onclick="closeModal(event)"><div class="modal-box" onclick="event.stopPropagation()"><h3>${title}</h3><p>${msg}</p><div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-danger" id="modalConfirmBtn"><i class="fas fa-trash"></i> Confirm</button></div></div></div>`;document.getElementById('modalConfirmBtn').addEventListener('click',()=>{closeModal();onConfirm();});}
   function closeModal(e){if(e&&e.target!==e.currentTarget)return;document.getElementById('modalContainer').innerHTML='';}
-  function confirmDeleteVehicle(id,name){showModal('Delete Vehicle',`Delete <strong>${name}</strong> permanently?`,()=>{db.ref('vehicles/'+id).remove().then(()=>showToast(`"${name}" deleted`,'danger'));});}
-  function confirmDeleteUser(id,name){showModal('Remove User',`Remove <strong>${name}</strong>?`,()=>{db.ref('users/'+id).remove().then(()=>showToast(`User "${name}" removed`,'danger'));});}
-  function confirmDeleteCartItem(id,name){showModal('Remove Cart Item',`Remove <strong>${name}</strong>?`,()=>{db.ref('Mycart/'+id).remove().then(()=>showToast(`"${name}" removed`,'danger'));});}
-  function confirmPurge(){showModal('Purge Expired','Delete all expired vehicle ads now?',()=>purgeExpired(true));}
+  function confirmDeleteVehicle(id,name){showModal('Delete Ad',`Delete <strong>${name}</strong> permanently?`,()=>{db.ref('vehicles/'+id).remove().then(()=>showToast(`"${name}" deleted`,'danger'));});}
+  function confirmPurge(){showModal('Purge Expired','Delete all expired ads now?',()=>purgeExpired(true));}
 
-  /* ========== LISTENERS ========== */
+  // ============================================
+  // Firebase Listeners
+  // ============================================
   function attachListeners(){
     if(listenersAttached)return;listenersAttached=true;
-    db.ref('vehicles').on('value',snap=>{vehiclesData=snap.val()||{};updateStats();renderVehicles();renderDashboardVehicles();Object.entries(vehiclesData).forEach(([id,v])=>{if(getRemainingMs(v)<=0){db.ref('vehicles/'+id).remove();showToast(`Auto-deleted: ${getVehicleName(v)}`,'danger');}});},err=>showToast('Vehicles error: '+err.message,'danger'));
+    db.ref('settings').on('value',snap=>applySettings(snap.val()||{}));
+    db.ref('vehicles').on('value',snap=>{vehiclesData=snap.val()||{};updateStats();renderVehicles();renderDashboardVehicles();Object.entries(vehiclesData).forEach(([id,v])=>{if(getRemainingMs(v)<=0&&getVehicleTimestamp(v)>0){db.ref('vehicles/'+id).remove();showToast(`Auto-deleted: ${getVehicleName(v)}`,'danger');}});},err=>showToast('Vehicles error: '+err.message,'danger'));
     db.ref('users').on('value',snap=>{usersData=snap.val()||{};updateStats();renderUsers();},err=>showToast('Users error: '+err.message,'danger'));
-    db.ref('Mycart').on('value',snap=>{cartData=snap.val()||{};updateStats();renderCart();},err=>showToast('Cart error: '+err.message,'danger'));
-    db.ref('vehicles').on('child_added',snap=>{const v=snap.val();if(!v)return;const a=v.addedAt||v.timestamp||v.createdAt||0;if(a&&(Date.now()-a)<10000)showToast(`New vehicle: ${getVehicleName(v)}`,'success');});
+    db.ref('vehicles').on('child_added',snap=>{const v=snap.val();if(!v)return;const a=getVehicleTimestamp(v);if(a&&(Date.now()-a)<10000)showToast(`New ad: ${getVehicleName(v)}`,'success');});
   }
 </script>
 </body>
