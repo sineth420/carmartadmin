@@ -10,6 +10,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 :root{--deep:#090b0f;--main:#0e1117;--card:#151a23;--card2:#1b2130;--bdr:#232a38;--bdr2:#2d3749;--pri:#e6ebf3;--sec:#8894a7;--mut:#535f74;--acc:#f59e0b;--accd:rgba(245,158,11,.12);--red:#ef4444;--redd:rgba(239,68,68,.12);--grn:#22c55e;--grnd:rgba(34,197,94,.12);--blu:#3b82f6;--blud:rgba(59,130,246,.12);--pur:#a855f7;--purd:rgba(168,85,247,.12);--cyn:#06b6d4;--cynd:rgba(6,182,212,.12)}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -154,6 +155,8 @@ body{font-family:'Outfit',sans-serif;background:var(--deep);color:var(--pri);min
 @media(max-width:900px){.al{grid-template-columns:1fr}.sb{position:fixed;left:-260px;z-index:100;transition:left .3s ease;box-shadow:4px 0 30px rgba(0,0,0,.5)}.sb.op{left:0}.mt{display:flex!important}.mc{padding:20px}.esr{flex-direction:column}}
 .mt{display:none;align-items:center;justify-content:center;width:40px;height:40px;border-radius:8px;background:var(--card);border:1px solid var(--bdr);color:var(--pri);cursor:pointer;font-size:18px;margin-bottom:16px}
 @keyframes spin{to{transform:rotate(360deg)}}.fa-spin{animation:spin 1s linear infinite}
+.cw{background:var(--card);border:1px solid var(--bdr);border-radius:12px;padding:20px;margin-bottom:24px}
+.cw h3{font-size:14px;font-weight:600;margin-bottom:12px;color:var(--sec)}
 </style>
 </head>
 <body>
@@ -179,6 +182,7 @@ body{font-family:'Outfit',sans-serif;background:var(--deep);color:var(--pri);min
     <div class="ns">
       <div class="nl">Manage</div>
       <div class="ni" data-p="vehicles" onclick="swP('vehicles')"><i class="fas fa-car-side"></i> Vehicles<span class="nb" id="VB">0</span></div>
+      <div class="ni" data-p="homeads" onclick="swP('homeads')"><i class="fas fa-house"></i> Home Ads<span class="nb" id="HB">0</span></div>
       <div class="ni" data-p="search" onclick="swP('search')"><i class="fas fa-magnifying-glass"></i> Search Ads</div>
       <div class="ni" data-p="users" onclick="swP('users')"><i class="fas fa-users"></i> Users<span class="nb" id="UB">0</span></div>
     </div>
@@ -190,13 +194,16 @@ body{font-family:'Outfit',sans-serif;background:var(--deep);color:var(--pri);min
     <div class="ub"><i class="fas fa-shield-halved" style="color:var(--grn)"></i> Signed in as <span class="ue" id="UE">—</span><button class="lo" onclick="doLogout()"><i class="fas fa-right-from-bracket"></i> Sign Out</button></div>
 
     <div class="sp act" id="P-dashboard">
-      <div class="ph"><h2>Dashboard</h2><p>Real-time overview</p></div>
+      <div class="ph"><h2>Dashboard</h2><p>Real-time overview (Sri Lanka Time)</p></div>
       <div class="sr">
-        <div class="sc"><div class="si2" style="background:var(--accd);color:var(--acc)"><i class="fas fa-car-side"></i></div><div class="sv" id="S1">—</div><div class="sla">Vehicles</div></div>
-        <div class="sc"><div class="si2" style="background:var(--blud);color:var(--blu)"><i class="fas fa-users"></i></div><div class="sv" id="S2">—</div><div class="sla">Users</div></div>
-        <div class="sc"><div class="si2" style="background:var(--redd);color:var(--red)"><i class="fas fa-clock"></i></div><div class="sv" id="S3">—</div><div class="sla">Expiring</div></div>
+        <div class="sc"><div class="si2" style="background:var(--accd);color:var(--acc)"><i class="fas fa-car-side"></i></div><div class="sv" id="S1">—</div><div class="sla">Total Vehicles</div></div>
+        <div class="sc"><div class="si2" style="background:var(--blud);color:var(--blu)"><i class="fas fa-users"></i></div><div class="sv" id="S2">—</div><div class="sla">Total Users</div></div>
+        <div class="sc"><div class="si2" style="background:var(--redd);color:var(--red)"><i class="fas fa-clock"></i></div><div class="sv" id="S3">—</div><div class="sla">Expiring Soon</div></div>
         <div class="sc"><div class="si2" style="background:var(--cynd);color:var(--cyn)"><i class="fas fa-house"></i></div><div class="sv" id="S4">—</div><div class="sla">On Home</div></div>
+        <div class="sc"><div class="si2" style="background:var(--grnd);color:var(--grn)"><i class="fas fa-plus-circle"></i></div><div class="sv" id="S5">—</div><div class="sla">Posted Today</div></div>
+        <div class="sc"><div class="si2" style="background:var(--purd);color:var(--pur)"><i class="fas fa-sign-in-alt"></i></div><div class="sv" id="S6">—</div><div class="sla">Logins Today</div></div>
       </div>
+      <div class="cw"><h3><i class="fas fa-chart-line" style="margin-right:6px;color:var(--acc)"></i> Ads Posted (Last 7 Days)</h3><canvas id="ADGRAPH" height="100"></canvas></div>
       <div class="tw"><div class="th"><h3>Recent Ads</h3><button class="bt bt-g" onclick="swP('vehicles')"><i class="fas fa-arrow-right"></i> All</button></div>
       <table class="dt"><thead><tr><th>Vehicle</th><th>Price</th><th>Status</th><th>Expires In</th></tr></thead><tbody id="DTB"><tr><td colspan="4"><div class="es"><i class="fas fa-spinner fa-spin"></i><p>Loading...</p></div></td></tr></tbody></table></div>
     </div>
@@ -205,6 +212,12 @@ body{font-family:'Outfit',sans-serif;background:var(--deep);color:var(--pri);min
       <div class="ph"><h2>Vehicles</h2><p>All listings with countdown</p></div>
       <div class="tw"><div class="th"><h3>All <span style="color:var(--mut);font-weight:400;font-size:13px;margin-left:8px" id="VC"></span></h3><input type="text" class="sbx" placeholder="Search..." id="VS" oninput="rV()"></div>
       <table class="dt"><thead><tr><th>Vehicle</th><th>Price</th><th>Status</th><th>Countdown</th><th>Home</th></tr></thead><tbody id="VTB"><tr><td colspan="5"><div class="es"><i class="fas fa-spinner fa-spin"></i><p>Loading...</p></div></td></tr></tbody></table></div>
+    </div>
+
+    <div class="sp" id="P-homeads">
+      <div class="ph"><h2>Home Ads</h2><p>Vehicles currently featured on homepage</p></div>
+      <div class="tw"><div class="th"><h3>Featured <span style="color:var(--mut);font-weight:400;font-size:13px;margin-left:8px" id="HAC"></span></h3></div>
+      <table class="dt"><thead><tr><th>Vehicle</th><th>Price</th><th>Owner</th><th>Home Expires In</th></tr></thead><tbody id="HATB"><tr><td colspan="4"><div class="es"><i class="fas fa-spinner fa-spin"></i><p>Loading...</p></div></td></tr></tbody></table></div>
     </div>
 
     <div class="sp" id="P-search">
@@ -250,6 +263,38 @@ var db=firebase.database(),au=firebase.auth();
 var VR={},UD={},SD={},FV={};
 var DPD=15,EPD=15,ci=null,ai=null,ia=false,la=false;
 var D=86400000;
+var adChart = null;
+
+/* ========== SRI LANKA TIME (UTC+5:30) ========== */
+function getSLTodayStart() {
+    var now = new Date();
+    var slOffset = 5.5 * 60 * 60 * 1000; 
+    var utcTime = now.getTime() + now.getTimezoneOffset() * 60000;
+    var slTime = new Date(utcTime + slOffset);
+    slTime.setHours(0,0,0,0);
+    return slTime.getTime() - slOffset;
+}
+
+function get7DayBuckets() {
+    var buckets = [];
+    var slOffset = 5.5 * 60 * 60 * 1000;
+    for(var i=6; i>=0; i--) {
+        var now = new Date();
+        var utcTime = now.getTime() + now.getTimezoneOffset() * 60000;
+        var slTime = new Date(utcTime + slOffset);
+        slTime.setDate(slTime.getDate() - i);
+        slTime.setHours(0,0,0,0);
+        var start = slTime.getTime() - slOffset;
+        slTime.setHours(23,59,59,999);
+        var end = slTime.getTime() - slOffset;
+        buckets.push({
+            start: start,
+            end: end,
+            label: new Date(start).toLocaleDateString('en-US', {month:'short', day:'numeric', timeZone:'Asia/Colombo'})
+        });
+    }
+    return buckets;
+}
 
 /* ========== TOAST ========== */
 function T(m,t){t=t||'info';var c=document.getElementById('TC');var ic={success:'fa-check-circle',danger:'fa-exclamation-circle',info:'fa-info-circle',extend:'fa-clock-rotate-left',home:'fa-house'};var e=document.createElement('div');var cls='tt ';if(t==='success')cls+='tt-s';else if(t==='danger')cls+='tt-d';else if(t==='extend')cls+='tt-e';else if(t==='home')cls+='tt-h';else cls+='tt-i';e.className=cls;e.innerHTML='<i class="fas '+(ic[t]||ic.info)+'"></i><span>'+m+'</span>';c.appendChild(e);setTimeout(function(){e.classList.add('rm');setTimeout(function(){e.remove()},300)},3500)}
@@ -266,46 +311,12 @@ au.onAuthStateChanged(function(u){if(u&&!ia){db.ref('admins/'+u.uid).once('value
 
 function swP(p){document.querySelectorAll('.sp').forEach(function(e){e.classList.remove('act')});document.querySelectorAll('.ni').forEach(function(e){e.classList.remove('act')});var a=document.getElementById('P-'+p),b=document.querySelector('.ni[data-p="'+p+'"]');if(a)a.classList.add('act');if(b)b.classList.add('act');document.getElementById('SB').classList.remove('op')}
 
-/* ============================================
-   FLATTEN VEHICLES
-   Stores FULL PATH as key:
-   "Cars/-NxABC" or "Buses/-NxDEF" etc.
-   ALL writes use db.ref('vehicles/' + fullpath)
-   to write BACK to the original nested path
-   ============================================ */
-function flV(raw){
-  var flat={};
-  if(!raw||typeof raw!=='object')return flat;
-  Object.keys(raw).forEach(function(catKey){
-    var catVal=raw[catKey];
-    if(!catVal||typeof catVal!=='object')return;
-    // Check if catKey is a vehicle itself (flat structure)
-    var isV=!!(catVal.name||catVal.title||catVal.vehicleName||catVal.brand||catVal.model||catVal.price!==undefined||catVal.timestamp||catVal.userId||catVal.uid||catVal.ownerId||catVal.home!==undefined);
-    if(isV){
-      // Flat: key is the adId directly
-      flat[catKey]=catVal;
-    }else{
-      // Nested: catKey is category name (Cars, Buses...)
-      // Children are the actual ads
-      Object.keys(catVal).forEach(function(adKey){
-        var adVal=catVal[adKey];
-        if(adVal&&typeof adVal==='object'){
-          // Store FULL PATH: "Cars/-NxABC"
-          flat[catKey+'/'+adKey]=adVal;
-        }
-      });
-    }
-  });
-  return flat;
-}
-
-/* Convert flatKey to safe HTML id (replace / with _) */
+/* ========== FLATTEN VEHICLES ========== */
+function flV(raw){var flat={};if(!raw||typeof raw!=='object')return flat;Object.keys(raw).forEach(function(catKey){var catVal=raw[catKey];if(!catVal||typeof catVal!=='object')return;var isV=!!(catVal.name||catVal.title||catVal.vehicleName||catVal.brand||catVal.model||catVal.price!==undefined||catVal.timestamp||catVal.userId||catVal.uid||catVal.ownerId||catVal.home!==undefined);if(isV){flat[catKey]=catVal}else{Object.keys(catVal).forEach(function(adKey){var adVal=catVal[adKey];if(adVal&&typeof adVal==='object'){flat[catKey+'/'+adKey]=adVal}})}});return flat}
 function sI(fk){return fk.replace(/\//g,'_')}
-
-/* Get the FULL Firebase ref path: vehicles/Cars/-NxABC */
 function gP(fk){return'vehicles/'+fk}
 
-/* ========== COUNTDOWN ========== */
+/* ========== COUNTDOWN & HELPERS ========== */
 function gT(v){var t=v.timestamp||v.addedAt||v.createdAt||0;return(typeof t==='number'?t:new Date(t).getTime())||0}
 function gE(v){var t=gT(v);if(!t)return Date.now()+DPD*D;return t+DPD*D}
 function gR(v){return gE(v)-Date.now()}
@@ -317,57 +328,118 @@ function gB(s,x){if(x)return'<span class="bg bg-e"><i class="fas fa-arrows-rotat
 function gCo(ms,x){if(x){if(ms/D<=0)return'var(--red)';return'var(--pur)'}var d=ms/D;if(d<=0)return'var(--red)';if(d<=3)return'var(--acc)';return'var(--grn)'}
 function gHR(v){if(!v.timestamphome)return 0;return v.timestamphome-Date.now()}
 function fH(ms){if(ms<=0)return'Expired';var d=Math.floor(ms/D),h=Math.floor((ms%D)/36e5),m=Math.floor((ms%36e5)/6e4);return d+'d '+h+'h '+m+'m'}
-
 function gI(v){if(v.imageUrl)return'<img src="'+v.imageUrl+'" alt="" onerror="this.parentElement.innerHTML=\'<i class=\\\'fas fa-car\\\'></i>\'">';return'<i class="fas fa-car"></i>'}
 function gN(v){return v.name||v.title||v.vehicleName||((v.brand||'')+' '+(v.model||'')).trim()||'Unnamed'}
 function gPr(v){var p=v.price||v.cost||0;return typeof p==='number'?'Rs. '+p.toLocaleString():p||'—'}
 function fD(t){if(!t)return'—';var d=new Date(typeof t==='number'?t:t);if(isNaN(d.getTime()))return'—';return d.toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'})}
 function gU(n){return(n||'U').charAt(0).toUpperCase()}
 function gO(v){return v.userId||v.uid||v.ownerId||v.sellerId||v.user_uid||v.postedBy||v.createdBy||''}
+function getUserInfo(uid){var u=UD[uid];if(!u)return{name:'Unknown',email:'—'};return{name:u.name||u.displayName||u.username||'Unknown', email:u.email||'—'}}
 
-/* ========== RENDER VEHICLES ========== */
-function rV(){var s=(document.getElementById('VS')?document.getElementById('VS').value:'').toLowerCase();var en=Object.entries(FV).filter(function(e){return gN(e[1]).toLowerCase().includes(s)||gO(e[1]).toLowerCase().includes(s)});document.getElementById('VC').textContent='('+en.length+')';var tb=document.getElementById('VTB');if(!en.length){tb.innerHTML='<tr><td colspan="5"><div class="es"><i class="fas fa-car-side"></i><p>No vehicles</p></div></td></tr>';return}tb.innerHTML=en.map(function(e){var fk=e[0],v=e[1],n=gN(v),p=gPr(v),r=gR(v),st=gS(r),x=iE(v),pc=gPc(r),co=gCo(r,x),f=fC(r),h=!!v.home,o=gO(v);return'<tr><td><div class="vc"><div class="vt">'+gI(v)+'</div><div><div style="font-weight:600">'+n+'</div><div style="font-size:11px;color:var(--mut)">'+fk+'</div></div></div></td><td><span class="pr">'+p+'</span></td><td>'+gB(st,x)+'</td><td><div class="cc"><span class="ct" style="color:'+co+'" data-c="'+fk+'">'+f+'</span><div class="cb"><div class="cbf" style="width:'+pc+'%;background:'+co+'" data-b="'+fk+'"></div></div></div></td><td>'+(h?'<span class="bg bg-h"><i class="fas fa-house" style="font-size:8px"></i> Home</span>':'—')+'</td></tr>'}).join('')}
+/* ========== RENDER ========== */
+function rV(){var s=(document.getElementById('VS')?document.getElementById('VS').value:'').toLowerCase();var en=Object.entries(FV).filter(function(e){return gN(e[1]).toLowerCase().includes(s)||gO(e[1]).toLowerCase().includes(s)});document.getElementById('VC').textContent='('+en.length+')';var tb=document.getElementById('VTB');if(!en.length){tb.innerHTML='<tr><td colspan="5"><div class="es"><i class="fas fa-car-side"></i><p>No vehicles</p></div></td></tr>';return}tb.innerHTML=en.map(function(e){var fk=e[0],v=e[1],n=gN(v),p=gPr(v),r=gR(v),st=gS(r),x=iE(v),pc=gPc(r),co=gCo(r,x),f=fC(r),h=!!v.home;return'<tr><td><div class="vc"><div class="vt">'+gI(v)+'</div><div><div style="font-weight:600">'+n+'</div><div style="font-size:11px;color:var(--mut)">'+fk+'</div></div></div></td><td><span class="pr">'+p+'</span></td><td>'+gB(st,x)+'</td><td><div class="cc"><span class="ct" style="color:'+co+'" data-c="'+fk+'">'+f+'</span><div class="cb"><div class="cbf" style="width:'+pc+'%;background:'+co+'" data-b="'+fk+'"></div></div></div></td><td>'+(h?'<span class="bg bg-h"><i class="fas fa-house" style="font-size:8px"></i> Home</span>':'—')+'</td></tr>'}).join('')}
 
 function rD(){var en=Object.entries(FV).sort(function(a,b){return gT(b[1])-gT(a[1])}).slice(0,5);var tb=document.getElementById('DTB');if(!en.length){tb.innerHTML='<tr><td colspan="4"><div class="es"><i class="fas fa-car-side"></i><p>No vehicles</p></div></td></tr>';return}tb.innerHTML=en.map(function(e){var fk=e[0],v=e[1],n=gN(v),p=gPr(v),r=gR(v),st=gS(r),x=iE(v),co=gCo(r,x),f=fC(r);return'<tr><td><div class="vc"><div class="vt">'+gI(v)+'</div><span style="font-weight:600">'+n+'</span></div></td><td><span class="pr">'+p+'</span></td><td>'+gB(st,x)+'</td><td><span class="ct" style="color:'+co+'" data-c="d-'+fk+'">'+f+'</span></td></tr>'}).join('')}
 
+function rH(){var en=Object.entries(FV).filter(function(e){return e[1].home===true});document.getElementById('HAC').textContent='('+en.length+')';document.getElementById('HB').textContent=en.length;var tb=document.getElementById('HATB');if(!en.length){tb.innerHTML='<tr><td colspan="4"><div class="es"><i class="fas fa-house"></i><p>No vehicles on home</p></div></td></tr>';return}tb.innerHTML=en.map(function(e){var fk=e[0],v=e[1],n=gN(v),p=gPr(v),hr=gHR(v),uid=gO(v),user=getUserInfo(uid);return'<tr><td><div class="vc"><div class="vt">'+gI(v)+'</div><div><div style="font-weight:600">'+n+'</div><div style="font-size:11px;color:var(--mut)">'+fk+'</div></div></div></td><td><span class="pr">'+p+'</span></td><td><div class="uc"><div class="av">'+gU(user.name)+'</div><div><div style="font-weight:600">'+user.name+'</div><div style="font-size:11px;color:var(--mut)">'+user.email+'</div></div></div></td><td><span class="ct" style="color:'+(hr>0?'var(--cyn)':'var(--red)')+'" data-hc="'+fk+'">'+fH(hr)+'</span></td></tr>'}).join('')}
+
 function rU(){var s=(document.getElementById('US')?document.getElementById('US').value:'').toLowerCase();var en=Object.entries(UD).filter(function(e){var id=e[0],u=e[1],n=(u.name||u.displayName||u.username||'').toLowerCase(),em=(u.email||'').toLowerCase();return n.includes(s)||em.includes(s)||id.toLowerCase().includes(s)});document.getElementById('UC').textContent='('+en.length+')';var tb=document.getElementById('UTB');if(!en.length){tb.innerHTML='<tr><td colspan="3"><div class="es"><i class="fas fa-users"></i><p>No users</p></div></td></tr>';return}tb.innerHTML=en.map(function(e){var id=e[0],u=e[1],n=u.name||u.displayName||u.username||'Unknown',em=u.email||'—';return'<tr><td><div class="uc"><div class="av">'+gU(n)+'</div><div><div style="font-weight:600">'+n+'</div></div></div></td><td style="font-size:13px;color:var(--sec)">'+em+'</td><td style="font-size:11px;color:var(--mut);font-family:JetBrains Mono,monospace">'+id+'</td></tr>'}).join('')}
 
-function uSt(){var vc=Object.keys(FV).length,uc=Object.keys(UD).length,ex=0,ho=0;Object.values(FV).forEach(function(v){var r=gR(v);if(r>0&&r/D<=3)ex++;if(v.home)ho++});document.getElementById('S1').textContent=vc;document.getElementById('S2').textContent=uc;document.getElementById('S3').textContent=ex;document.getElementById('S4').textContent=ho;document.getElementById('VB').textContent=vc;document.getElementById('UB').textContent=uc}
+/* ========== CHART ========== */
+function rGraph(){
+    var buckets = get7DayBuckets();
+    var counts = new Array(7).fill(0);
+    var labels = buckets.map(function(b){return b.label});
+    
+    Object.values(FV).forEach(function(v){
+        var t = gT(v);
+        for(var i=0; i<buckets.length; i++){
+            if(t >= buckets[i].start && t <= buckets[i].end){
+                counts[i]++;
+                break;
+            }
+        }
+    });
+
+    var ctx = document.getElementById('ADGRAPH').getContext('2d');
+    if(adChart) adChart.destroy();
+    
+    var gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, 'rgba(245, 158, 11, 0.4)');
+    gradient.addColorStop(1, 'rgba(245, 158, 11, 0.0)');
+
+    adChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'New Ads',
+                data: counts,
+                borderColor: '#f59e0b',
+                backgroundColor: gradient,
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: '#f59e0b',
+                pointRadius: 4,
+                pointHoverRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { color: '#535f74', font: { family: 'JetBrains Mono' }, stepSize: 1 },
+                    grid: { color: 'rgba(255,255,255,0.05)' }
+                },
+                x: {
+                    ticks: { color: '#8894a7', font: { family: 'Outfit' } },
+                    grid: { display: false }
+                }
+            }
+        }
+    });
+}
+
+/* ========== STATS ========== */
+function uSt(){
+    var vc=Object.keys(FV).length,uc=Object.keys(UD).length,ex=0,ho=0,pt=0;
+    var todayStart = getSLTodayStart();
+    
+    Object.values(FV).forEach(function(v){
+        var r=gR(v);
+        if(r>0&&r/D<=3)ex++;
+        if(v.home)ho++;
+        if(gT(v) >= todayStart)pt++;
+    });
+
+    var lt=0;
+    Object.values(UD).forEach(function(u){
+        if(u.lastLogin && u.lastLogin >= todayStart)lt++;
+    });
+
+    document.getElementById('S1').textContent=vc;
+    document.getElementById('S2').textContent=uc;
+    document.getElementById('S3').textContent=ex;
+    document.getElementById('S4').textContent=ho;
+    document.getElementById('S5').textContent=pt;
+    document.getElementById('S6').textContent=lt;
+    document.getElementById('VB').textContent=vc;
+    document.getElementById('UB').textContent=uc;
+}
 
 function sCT(){if(ci)clearInterval(ci);ci=setInterval(function(){document.querySelectorAll('[data-c]').forEach(function(el){var fk=el.getAttribute('data-c');if(fk.indexOf('d-')===0)fk=fk.substring(2);if(fk.indexOf('s-')===0)fk=fk.substring(2);var v=FV[fk];if(!v)return;var r=gR(v);el.textContent=fC(r);el.style.color=gCo(r,iE(v))});document.querySelectorAll('[data-b]').forEach(function(el){var fk=el.getAttribute('data-b');var v=FV[fk];if(!v)return;var r=gR(v);el.style.width=gPc(r)+'%';el.style.background=gCo(r,iE(v))});document.querySelectorAll('[data-hc]').forEach(function(el){var fk=el.getAttribute('data-hc');var v=FV[fk];if(!v)return;el.textContent=fH(gHR(v))})},1000)}
-
 function sAC(){if(ai)clearInterval(ai);ai=setInterval(function(){pE(false)},60000)}
+function pE(sm){if(sm===undefined)sm=true;var td=[];Object.keys(FV).forEach(function(fk){if(gR(FV[fk])<=0&&gT(FV[fk])>0)td.push(fk)});if(!td.length){if(sm)T('No expired','info');return}var updates={};td.forEach(function(fk){updates[fk]=null});db.ref('vehicles').update(updates).then(function(){T('Deleted '+td.length+' expired','danger')}).catch(function(e){T('Purge failed: '+e.message,'danger')})}
 
-function pE(sm){if(sm===undefined)sm=true;var td=[];Object.keys(FV).forEach(function(fk){if(gR(FV[fk])<=0&&gT(FV[fk])>0)td.push(fk)});if(!td.length){if(sm)T('No expired','info');return}/* Use multi-path update with full paths */var updates={};td.forEach(function(fk){updates[fk]=null});db.ref('vehicles').update(updates).then(function(){T('Deleted '+td.length+' expired','danger')}).catch(function(e){T('Purge failed: '+e.message,'danger')})}
-
-/* ============================================
-   EXTEND — writes to original nested path
-   e.g. db.ref('vehicles/Cars/-NxABC').update({timestamp: newTs})
-   ============================================ */
-function exV(fk){
-  var v=FV[fk];if(!v)return;
-  var ct=gT(v);
-  var nt=ct+(EPD*D);
-  var path=gP(fk); /* vehicles/Cars/-NxABC */
-  T('Writing to: '+path,'info');
-  db.ref(path).update({timestamp:nt}).then(function(){T('"'+gN(v)+'" extended +'+EPD+'d → '+path,'extend')}).catch(function(e){T('Extend failed: '+e.message,'danger')});
-}
-
-/* ============================================
-   ADD TO HOME — writes to original nested path
-   e.g. db.ref('vehicles/Cars/-NxABC').update({home: true, timestamphome: ...})
-   ============================================ */
-function tgH(fk,dy){
-  var v=FV[fk];if(!v)return;
-  var path=gP(fk); /* vehicles/Cars/-NxABC */
-  T('Writing to: '+path,'info');
-  if(v.home){
-    db.ref(path).update({home:false,timestamphome:null}).then(function(){T('"'+gN(v)+'" removed from Home → '+path,'info')}).catch(function(e){T('Failed: '+e.message,'danger')});
-  }else{
-    db.ref(path).update({home:true,timestamphome:Date.now()+(dy*D)}).then(function(){T('"'+gN(v)+'" added to Home for '+dy+'d → '+path,'home')}).catch(function(e){T('Failed: '+e.message,'danger')});
-  }
-}
-
+/* ========== ACTIONS ========== */
+function exV(fk){var v=FV[fk];if(!v)return;var ct=gT(v);var nt=ct+(EPD*D);var path=gP(fk);T('Writing to: '+path,'info');db.ref(path).update({timestamp:nt}).then(function(){T('"'+gN(v)+'" extended +'+EPD+'d → '+path,'extend')}).catch(function(e){T('Extend failed: '+e.message,'danger')})}
+function tgH(fk,dy){var v=FV[fk];if(!v)return;var path=gP(fk);T('Writing to: '+path,'info');if(v.home){db.ref(path).update({home:false,timestamphome:null}).then(function(){T('"'+gN(v)+'" removed from Home → '+path,'info')}).catch(function(e){T('Failed: '+e.message,'danger')})}else{db.ref(path).update({home:true,timestamphome:Date.now()+(dy*D)}).then(function(){T('"'+gN(v)+'" added to Home for '+dy+'d → '+path,'home')}).catch(function(e){T('Failed: '+e.message,'danger')})}}
 function shHD(fk){var c=document.getElementById('hd_'+sI(fk));if(!c)return;c.innerHTML='<span class="hdp"><span style="font-size:11px;color:var(--mut)">For:</span><button class="hdb" style="background:var(--cynd);color:var(--cyn)" onclick="tgH(\''+fk+'\',7);setTimeout(function(){srch()},800)">7d</button><button class="hdb" style="background:var(--cyn);color:#fff" onclick="tgH(\''+fk+'\',14);setTimeout(function(){srch()},800)">14d</button></span>'}
 
 /* ========== SEARCH ========== */
@@ -384,10 +456,10 @@ function aL(){if(la)return;la=true;
     VR=s.val()||{};
     FV=flV(VR);
     Object.keys(FV).forEach(function(fk){var v=FV[fk];var t=gT(v),ot=v.timestamp||0;if(ot&&t>ot)v._ef=true});
-    uSt();rV();rD();
+    uSt();rV();rD();rH();rGraph();
     Object.entries(FV).forEach(function(e){var fk=e[0],v=e[1];if(gR(v)<=0&&gT(v)>0){db.ref(gP(fk)).remove();T('Auto-deleted: '+gN(v)+' ('+fk+')','danger')}});
   },function(){T('Vehicles error','danger')});
-  db.ref('users').on('value',function(s){UD=s.val()||{};uSt();rU()},function(){T('Users error','danger')});
+  db.ref('users').on('value',function(s){UD=s.val()||{};uSt();rU();rH()},function(){T('Users error','danger')});
 }
 </script>
 </body>
