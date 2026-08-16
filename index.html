@@ -76,11 +76,7 @@ body{font-family:'Outfit',sans-serif;background:var(--deep);color:var(--pri);min
 .cbf{height:100%;border-radius:3px;transition:width 1s linear}
 .ct{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;white-space:nowrap}
 .bg{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
-.bg-a{background:var(--grnd);color:var(--grn)}
-.bg-x{background:var(--accd);color:var(--acc)}
-.bg-d{background:var(--redd);color:var(--red)}
-.bg-e{background:var(--purd);color:var(--pur)}
-.bg-h{background:var(--cynd);color:var(--cyn)}
+.bg-a{background:var(--grnd);color:var(--grn)}.bg-x{background:var(--accd);color:var(--acc)}.bg-d{background:var(--redd);color:var(--red)}.bg-e{background:var(--purd);color:var(--pur)}.bg-h{background:var(--cynd);color:var(--cyn)}
 .bt{padding:7px 14px;border-radius:7px;font-size:12px;font-weight:600;font-family:'Outfit',sans-serif;cursor:pointer;border:none;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
 .bt-d{background:var(--redd);color:var(--red)}.bt-d:hover{background:var(--red);color:#fff}
 .bt-e{background:var(--purd);color:var(--pur)}.bt-e:hover{background:var(--pur);color:#fff}
@@ -88,7 +84,7 @@ body{font-family:'Outfit',sans-serif;background:var(--deep);color:var(--pri);min
 .bt-ho{background:var(--cyn);color:#fff}.bt-ho:hover{filter:brightness(1.1)}
 .bt-g{background:transparent;color:var(--sec);border:1px solid var(--bdr)}.bt-g:hover{background:var(--card2);color:var(--pri)}
 .tc{position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px}
-.tt{background:var(--card);border:1px solid var(--bdr);border-radius:10px;padding:14px 18px;display:flex;align-items:center;gap:10px;font-size:13px;min-width:280px;max-width:420px;animation:ti .4s cubic-bezier(.16,1,.3,1);box-shadow:0 8px 30px rgba(0,0,0,.4)}
+.tt{background:var(--card);border:1px solid var(--bdr);border-radius:10px;padding:14px 18px;display:flex;align-items:center;gap:10px;font-size:13px;min-width:280px;max-width:440px;animation:ti .4s cubic-bezier(.16,1,.3,1);box-shadow:0 8px 30px rgba(0,0,0,.4)}
 .tt.rm{animation:to .3s ease forwards}
 .tt i{font-size:16px;flex-shrink:0}
 .tt-s i{color:var(--grn)}.tt-d i{color:var(--red)}.tt-i i{color:var(--blu)}.tt-e i{color:var(--pur)}.tt-h i{color:var(--cyn)}
@@ -154,6 +150,7 @@ body{font-family:'Outfit',sans-serif;background:var(--deep);color:var(--pri);min
 .sdbg{background:var(--main);border:1px solid var(--bdr);border-radius:8px;padding:12px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--mut);line-height:1.8}
 .sdbg strong{color:var(--acc)}
 .sdv{padding-top:12px;border-top:1px solid var(--bdr);margin-top:12px}
+.fpd{background:var(--cynd);color:var(--cyn);font-family:'JetBrains Mono',monospace;font-size:10px;padding:2px 8px;border-radius:4px;display:inline-block;margin-left:6px}
 @media(max-width:900px){.al{grid-template-columns:1fr}.sb{position:fixed;left:-260px;z-index:100;transition:left .3s ease;box-shadow:4px 0 30px rgba(0,0,0,.5)}.sb.op{left:0}.mt{display:flex!important}.mc{padding:20px}.esr{flex-direction:column}}
 .mt{display:none;align-items:center;justify-content:center;width:40px;height:40px;border-radius:8px;background:var(--card);border:1px solid var(--bdr);color:var(--pri);cursor:pointer;font-size:18px;margin-bottom:16px}
 @keyframes spin{to{transform:rotate(360deg)}}.fa-spin{animation:spin 1s linear infinite}
@@ -214,7 +211,7 @@ body{font-family:'Outfit',sans-serif;background:var(--deep);color:var(--pri);min
       <div class="ph"><h2>Search Ads</h2><p>Find user by email, extend or add to home</p></div>
       <div class="ep">
         <h3><i class="fas fa-magnifying-glass"></i> Search by Email</h3>
-        <div class="ed">Type user email → finds UID → finds all their vehicle ads</div>
+        <div class="ed">Type user email → finds their UID → finds all their vehicle ads. Changes go back to the original nested path (e.g. vehicles/Cars/-id).</div>
         <div class="esr">
           <input type="email" class="ei" id="EI" placeholder="user@example.com" onkeydown="if(event.key==='Enter')srch()">
           <button class="eb" onclick="srch()"><i class="fas fa-search"></i> Search</button>
@@ -254,28 +251,61 @@ var VR={},UD={},SD={},FV={};
 var DPD=15,EPD=15,ci=null,ai=null,ia=false,la=false;
 var D=86400000;
 
-function T(m,t){t=t||'info';var c=document.getElementById('TC');var ic={success:'fa-check-circle',danger:'fa-exclamation-circle',info:'fa-info-circle',extend:'fa-clock-rotate-left',home:'fa-house'};var e=document.createElement('div');e.className='tt tt-'+(t==='extend'?'e':t==='home'?'h':t==='success'?'s':t==='danger'?'d':'i');e.innerHTML='<i class="fas '+(ic[t]||ic.info)+'"></i><span>'+m+'</span>';c.appendChild(e);setTimeout(function(){e.classList.add('rm');setTimeout(function(){e.remove()},300)},3500)}
+/* ========== TOAST ========== */
+function T(m,t){t=t||'info';var c=document.getElementById('TC');var ic={success:'fa-check-circle',danger:'fa-exclamation-circle',info:'fa-info-circle',extend:'fa-clock-rotate-left',home:'fa-house'};var e=document.createElement('div');var cls='tt ';if(t==='success')cls+='tt-s';else if(t==='danger')cls+='tt-d';else if(t==='extend')cls+='tt-e';else if(t==='home')cls+='tt-h';else cls+='tt-i';e.className=cls;e.innerHTML='<i class="fas '+(ic[t]||ic.info)+'"></i><span>'+m+'</span>';c.appendChild(e);setTimeout(function(){e.classList.add('rm');setTimeout(function(){e.remove()},300)},3500)}
 
+/* ========== SETTINGS ========== */
 function svS(k,v){v=Math.max(1,Math.min(365,v));var u={};u[k]=v;db.ref('settings').update(u).then(function(){T('Saved: '+k+' = '+v,'success');var i=k==='deletePeriodDays'?document.getElementById('SV1'):document.getElementById('SV2');if(i){i.classList.add('show');setTimeout(function(){i.classList.remove('show')},2000)}}).catch(function(e){T('Save failed: '+e.message,'danger')})}
-
 function apS(d){SD=d||{};if(SD.deletePeriodDays)DPD=Math.max(1,Math.min(365,SD.deletePeriodDays));if(SD.extendPeriodDays)EPD=Math.max(1,Math.min(365,SD.extendPeriodDays));var a=document.getElementById('DI'),b=document.getElementById('XI');if(a)a.value=DPD;if(b)b.value=EPD;var g=document.getElementById('SDI');if(g){g.innerHTML=Object.keys(SD).length?Object.entries(SD).map(function(e){return e[0]+': <strong>'+e[1]+'</strong>'}).join('<br>'):'Using defaults'}rV();rD()}
 
+/* ========== AUTH ========== */
 function doLogin(){var em=document.getElementById('LE').value.trim(),pw=document.getElementById('LP').value,bt=document.getElementById('LB'),el=document.getElementById('LERR'),ms=document.getElementById('LERRM');if(!em||!pw){ms.textContent='Enter email and password';el.classList.add('show');return}bt.disabled=true;bt.innerHTML='<i class="fas fa-spinner fa-spin"></i> Signing in...';el.classList.remove('show');au.signInWithEmailAndPassword(em,pw).then(function(c){var u=c.user.uid;return db.ref('admins/'+u).once('value').then(function(s){if(s.exists()){ia=true;enAP(c.user)}else{au.signOut();ms.innerHTML='Not admin. UID: <strong style="color:var(--acc);word-break:break-all;font-size:12px">'+u+'</strong>';el.classList.add('show');bt.disabled=false;bt.innerHTML='<i class="fas fa-right-to-bracket"></i> Sign In'}})}).catch(function(e){var m={'auth/user-not-found':'No account','auth/wrong-password':'Wrong password','auth/invalid-credential':'Invalid credentials','auth/too-many-requests':'Too many attempts'};ms.textContent=m[e.code]||e.message;el.classList.add('show');bt.disabled=false;bt.innerHTML='<i class="fas fa-right-to-bracket"></i> Sign In'})}
-
 function doLogout(){au.signOut().then(function(){la=false;document.getElementById('AP').style.display='none';document.getElementById('LS').style.display='flex'})}
-
 function enAP(u){document.getElementById('LS').style.display='none';document.getElementById('AP').style.display='block';document.getElementById('UE').textContent=u.email;T('Welcome!','success');aL();sCT();sAC()}
-
 au.onAuthStateChanged(function(u){if(u&&!ia){db.ref('admins/'+u.uid).once('value').then(function(s){if(s.exists()){ia=true;enAP(u)}else{au.signOut()}})}});
 
 function swP(p){document.querySelectorAll('.sp').forEach(function(e){e.classList.remove('act')});document.querySelectorAll('.ni').forEach(function(e){e.classList.remove('act')});var a=document.getElementById('P-'+p),b=document.querySelector('.ni[data-p="'+p+'"]');if(a)a.classList.add('act');if(b)b.classList.add('act');document.getElementById('SB').classList.remove('op')}
 
-// Flatten vehicles - stores FULL PATH like "Cars/-NxABC"
-function flV(r){var f={};if(!r||typeof r!=='object')return f;Object.entries(r).forEach(function(e){var k=e[0],v=e[1];if(!v||typeof v!=='object')return;var is=!!(v.name||v.title||v.vehicleName||v.brand||v.model||v.price!==undefined||v.timestamp||v.userId||v.uid||v.ownerId||v.home!==undefined);if(is){f[k]=v}else{Object.entries(v).forEach(function(c){var ck=c[0],cv=c[1];if(cv&&typeof cv==='object'){f[k+'/'+ck]=cv}})}});return f}
+/* ============================================
+   FLATTEN VEHICLES
+   Stores FULL PATH as key:
+   "Cars/-NxABC" or "Buses/-NxDEF" etc.
+   ALL writes use db.ref('vehicles/' + fullpath)
+   to write BACK to the original nested path
+   ============================================ */
+function flV(raw){
+  var flat={};
+  if(!raw||typeof raw!=='object')return flat;
+  Object.keys(raw).forEach(function(catKey){
+    var catVal=raw[catKey];
+    if(!catVal||typeof catVal!=='object')return;
+    // Check if catKey is a vehicle itself (flat structure)
+    var isV=!!(catVal.name||catVal.title||catVal.vehicleName||catVal.brand||catVal.model||catVal.price!==undefined||catVal.timestamp||catVal.userId||catVal.uid||catVal.ownerId||catVal.home!==undefined);
+    if(isV){
+      // Flat: key is the adId directly
+      flat[catKey]=catVal;
+    }else{
+      // Nested: catKey is category name (Cars, Buses...)
+      // Children are the actual ads
+      Object.keys(catVal).forEach(function(adKey){
+        var adVal=catVal[adKey];
+        if(adVal&&typeof adVal==='object'){
+          // Store FULL PATH: "Cars/-NxABC"
+          flat[catKey+'/'+adKey]=adVal;
+        }
+      });
+    }
+  });
+  return flat;
+}
 
-function gP(fk){return'vehicles/'+fk}
+/* Convert flatKey to safe HTML id (replace / with _) */
 function sI(fk){return fk.replace(/\//g,'_')}
 
+/* Get the FULL Firebase ref path: vehicles/Cars/-NxABC */
+function gP(fk){return'vehicles/'+fk}
+
+/* ========== COUNTDOWN ========== */
 function gT(v){var t=v.timestamp||v.addedAt||v.createdAt||0;return(typeof t==='number'?t:new Date(t).getTime())||0}
 function gE(v){var t=gT(v);if(!t)return Date.now()+DPD*D;return t+DPD*D}
 function gR(v){return gE(v)-Date.now()}
@@ -295,7 +325,8 @@ function fD(t){if(!t)return'—';var d=new Date(typeof t==='number'?t:t);if(isNa
 function gU(n){return(n||'U').charAt(0).toUpperCase()}
 function gO(v){return v.userId||v.uid||v.ownerId||v.sellerId||v.user_uid||v.postedBy||v.createdBy||''}
 
-function rV(){var s=(document.getElementById('VS')?document.getElementById('VS').value:'').toLowerCase();var en=Object.entries(FV).filter(function(e){return gN(e[1]).toLowerCase().includes(s)||gO(e[1]).toLowerCase().includes(s)});document.getElementById('VC').textContent='('+en.length+')';var tb=document.getElementById('VTB');if(!en.length){tb.innerHTML='<tr><td colspan="5"><div class="es"><i class="fas fa-car-side"></i><p>No vehicles</p></div></td></tr>';return}tb.innerHTML=en.map(function(e){var fk=e[0],v=e[1],n=gN(v),p=gPr(v),r=gR(v),st=gS(r),x=iE(v),pc=gPc(r),co=gCo(r,x),f=fC(r),h=!!v.home,o=gO(v);return'<tr><td><div class="vc"><div class="vt">'+gI(v)+'</div><div><div style="font-weight:600">'+n+'</div><div style="font-size:11px;color:var(--mut)">'+(o||fk)+'</div></div></div></td><td><span class="pr">'+p+'</span></td><td>'+gB(st,x)+'</td><td><div class="cc"><span class="ct" style="color:'+co+'" data-c="'+fk+'">'+f+'</span><div class="cb"><div class="cbf" style="width:'+pc+'%;background:'+co+'" data-b="'+fk+'"></div></div></div></td><td>'+(h?'<span class="bg bg-h"><i class="fas fa-house" style="font-size:8px"></i> Home</span>':'—')+'</td></tr>'}).join('')}
+/* ========== RENDER VEHICLES ========== */
+function rV(){var s=(document.getElementById('VS')?document.getElementById('VS').value:'').toLowerCase();var en=Object.entries(FV).filter(function(e){return gN(e[1]).toLowerCase().includes(s)||gO(e[1]).toLowerCase().includes(s)});document.getElementById('VC').textContent='('+en.length+')';var tb=document.getElementById('VTB');if(!en.length){tb.innerHTML='<tr><td colspan="5"><div class="es"><i class="fas fa-car-side"></i><p>No vehicles</p></div></td></tr>';return}tb.innerHTML=en.map(function(e){var fk=e[0],v=e[1],n=gN(v),p=gPr(v),r=gR(v),st=gS(r),x=iE(v),pc=gPc(r),co=gCo(r,x),f=fC(r),h=!!v.home,o=gO(v);return'<tr><td><div class="vc"><div class="vt">'+gI(v)+'</div><div><div style="font-weight:600">'+n+'</div><div style="font-size:11px;color:var(--mut)">'+fk+'</div></div></div></td><td><span class="pr">'+p+'</span></td><td>'+gB(st,x)+'</td><td><div class="cc"><span class="ct" style="color:'+co+'" data-c="'+fk+'">'+f+'</span><div class="cb"><div class="cbf" style="width:'+pc+'%;background:'+co+'" data-b="'+fk+'"></div></div></div></td><td>'+(h?'<span class="bg bg-h"><i class="fas fa-house" style="font-size:8px"></i> Home</span>':'—')+'</td></tr>'}).join('')}
 
 function rD(){var en=Object.entries(FV).sort(function(a,b){return gT(b[1])-gT(a[1])}).slice(0,5);var tb=document.getElementById('DTB');if(!en.length){tb.innerHTML='<tr><td colspan="4"><div class="es"><i class="fas fa-car-side"></i><p>No vehicles</p></div></td></tr>';return}tb.innerHTML=en.map(function(e){var fk=e[0],v=e[1],n=gN(v),p=gPr(v),r=gR(v),st=gS(r),x=iE(v),co=gCo(r,x),f=fC(r);return'<tr><td><div class="vc"><div class="vt">'+gI(v)+'</div><span style="font-weight:600">'+n+'</span></div></td><td><span class="pr">'+p+'</span></td><td>'+gB(st,x)+'</td><td><span class="ct" style="color:'+co+'" data-c="d-'+fk+'">'+f+'</span></td></tr>'}).join('')}
 
@@ -303,25 +334,61 @@ function rU(){var s=(document.getElementById('US')?document.getElementById('US')
 
 function uSt(){var vc=Object.keys(FV).length,uc=Object.keys(UD).length,ex=0,ho=0;Object.values(FV).forEach(function(v){var r=gR(v);if(r>0&&r/D<=3)ex++;if(v.home)ho++});document.getElementById('S1').textContent=vc;document.getElementById('S2').textContent=uc;document.getElementById('S3').textContent=ex;document.getElementById('S4').textContent=ho;document.getElementById('VB').textContent=vc;document.getElementById('UB').textContent=uc}
 
-function sCT(){if(ci)clearInterval(ci);ci=setInterval(function(){document.querySelectorAll('[data-c]').forEach(function(el){var fk=el.getAttribute('data-c').replace('d-','').replace('s-','');var v=FV[fk];if(!v)return;var r=gR(v);el.textContent=fC(r);el.style.color=gCo(r,iE(v))});document.querySelectorAll('[data-b]').forEach(function(el){var fk=el.getAttribute('data-b');var v=FV[fk];if(!v)return;var r=gR(v);el.style.width=gPc(r)+'%';el.style.background=gCo(r,iE(v))});document.querySelectorAll('[data-hc]').forEach(function(el){var fk=el.getAttribute('data-hc');var v=FV[fk];if(!v)return;el.textContent=fH(gHR(v))})},1000)}
+function sCT(){if(ci)clearInterval(ci);ci=setInterval(function(){document.querySelectorAll('[data-c]').forEach(function(el){var fk=el.getAttribute('data-c');if(fk.indexOf('d-')===0)fk=fk.substring(2);if(fk.indexOf('s-')===0)fk=fk.substring(2);var v=FV[fk];if(!v)return;var r=gR(v);el.textContent=fC(r);el.style.color=gCo(r,iE(v))});document.querySelectorAll('[data-b]').forEach(function(el){var fk=el.getAttribute('data-b');var v=FV[fk];if(!v)return;var r=gR(v);el.style.width=gPc(r)+'%';el.style.background=gCo(r,iE(v))});document.querySelectorAll('[data-hc]').forEach(function(el){var fk=el.getAttribute('data-hc');var v=FV[fk];if(!v)return;el.textContent=fH(gHR(v))})},1000)}
 
 function sAC(){if(ai)clearInterval(ai);ai=setInterval(function(){pE(false)},60000)}
 
-function pE(sm){if(sm===undefined)sm=true;var td=[];Object.entries(FV).forEach(function(e){if(gR(e[1])<=0&&gT(e[1])>0)td.push(e[0])});if(!td.length){if(sm)T('No expired','info');return}var u={};td.forEach(function(fk){u[fk]=null});db.ref('vehicles').update(u).then(function(){T('Deleted '+td.length+' expired','danger')}).catch(function(){T('Purge failed','danger')})}
+function pE(sm){if(sm===undefined)sm=true;var td=[];Object.keys(FV).forEach(function(fk){if(gR(FV[fk])<=0&&gT(FV[fk])>0)td.push(fk)});if(!td.length){if(sm)T('No expired','info');return}/* Use multi-path update with full paths */var updates={};td.forEach(function(fk){updates[fk]=null});db.ref('vehicles').update(updates).then(function(){T('Deleted '+td.length+' expired','danger')}).catch(function(e){T('Purge failed: '+e.message,'danger')})}
 
-function exV(fk){var v=FV[fk];if(!v)return;var ct=gT(v),nt=ct+(EPD*D);db.ref(gP(fk)).update({timestamp:nt}).then(function(){T('"'+gN(v)+'" extended +'+EPD+'d','extend')}).catch(function(e){T('Extend failed: '+e.message,'danger')})}
+/* ============================================
+   EXTEND — writes to original nested path
+   e.g. db.ref('vehicles/Cars/-NxABC').update({timestamp: newTs})
+   ============================================ */
+function exV(fk){
+  var v=FV[fk];if(!v)return;
+  var ct=gT(v);
+  var nt=ct+(EPD*D);
+  var path=gP(fk); /* vehicles/Cars/-NxABC */
+  T('Writing to: '+path,'info');
+  db.ref(path).update({timestamp:nt}).then(function(){T('"'+gN(v)+'" extended +'+EPD+'d → '+path,'extend')}).catch(function(e){T('Extend failed: '+e.message,'danger')});
+}
 
-function tgH(fk,dy){var v=FV[fk];if(!v)return;if(v.home){db.ref(gP(fk)).update({home:false,timestamphome:null}).then(function(){T('"'+gN(v)+'" removed from Home','info')})}else{db.ref(gP(fk)).update({home:true,timestamphome:Date.now()+(dy*D)}).then(function(){T('"'+gN(v)+'" added to Home for '+dy+'d','home')})}}
+/* ============================================
+   ADD TO HOME — writes to original nested path
+   e.g. db.ref('vehicles/Cars/-NxABC').update({home: true, timestamphome: ...})
+   ============================================ */
+function tgH(fk,dy){
+  var v=FV[fk];if(!v)return;
+  var path=gP(fk); /* vehicles/Cars/-NxABC */
+  T('Writing to: '+path,'info');
+  if(v.home){
+    db.ref(path).update({home:false,timestamphome:null}).then(function(){T('"'+gN(v)+'" removed from Home → '+path,'info')}).catch(function(e){T('Failed: '+e.message,'danger')});
+  }else{
+    db.ref(path).update({home:true,timestamphome:Date.now()+(dy*D)}).then(function(){T('"'+gN(v)+'" added to Home for '+dy+'d → '+path,'home')}).catch(function(e){T('Failed: '+e.message,'danger')});
+  }
+}
 
 function shHD(fk){var c=document.getElementById('hd_'+sI(fk));if(!c)return;c.innerHTML='<span class="hdp"><span style="font-size:11px;color:var(--mut)">For:</span><button class="hdb" style="background:var(--cynd);color:var(--cyn)" onclick="tgH(\''+fk+'\',7);setTimeout(function(){srch()},800)">7d</button><button class="hdb" style="background:var(--cyn);color:#fff" onclick="tgH(\''+fk+'\',14);setTimeout(function(){srch()},800)">14d</button></span>'}
 
-function srch(){var em=document.getElementById('EI').value.trim().toLowerCase();if(!em){T('Enter an email','info');return}var rc=document.getElementById('ER');rc.innerHTML='<div class="er"><div style="text-align:center;padding:30px;color:var(--mut)"><i class="fas fa-spinner fa-spin" style="font-size:24px;display:block;margin-bottom:8px"></i>Searching...</div></div>';var mu=[],mi={};Object.entries(UD).forEach(function(e){if((e[1].email||'').toLowerCase()===em){mu.push(e[0]);mi[e[0]]=e[1]}});var ma=[],ms=new Set();mu.forEach(function(uid){Object.entries(FV).forEach(function(e){var fk=e[0],v=e[1];if(ms.has(fk))return;if(gO(v)===uid){ms.add(fk);ma.push({fk:fk,v:v})}})});Object.entries(FV).forEach(function(e){var fk=e[0],v=e[1];if(ms.has(fk))return;var ve=(v.email||v.sellerEmail||v.userEmail||v.ownerEmail||'').toLowerCase();if(ve===em){ms.add(fk);ma.push({fk:fk,v:v})}});var dh='';if(mu.length>0){dh='<div class="di"><i class="fas fa-check-circle" style="color:var(--grn);margin-right:6px"></i>Found in users table<br>';mu.forEach(function(uid){var u=mi[uid];dh+='UID: <strong>'+uid+'</strong> → '+(u.name||u.displayName||u.username||'No name')+'<br>'});dh+='<br>Total vehicles: <strong>'+Object.keys(FV).length+'</strong><br>';var ao=new Set();Object.values(FV).forEach(function(v){var o=gO(v);if(o)ao.add(o)});dh+='OwnerIds in vehicles: <strong>'+ao.size+'</strong><br>';if(ao.size>0)dh+='Samples: '+Array.from(ao).slice(0,5).map(function(id){return'<strong>'+id+'</strong>'}).join(', ')+'<br>';dh+='</div>'}else{dh='<div class="di"><i class="fas fa-exclamation-triangle" style="color:var(--acc);margin-right:6px"></i>No user with email <strong>'+em+'</strong><br>Users: '+Object.keys(UD).length+' | Vehicles: '+Object.keys(FV).length+'</div>'}if(!ma.length){rc.innerHTML='<div class="er">'+dh+'<div class="es" style="padding:40px 20px"><i class="fas fa-search" style="font-size:36px"></i><p>No ads for <strong style="color:var(--pri)">'+em+'</strong></p><p style="font-size:12px;margin-top:8px">Vehicle ownerId doesn\'t match this UID</p></div></div>';return}rc.innerHTML='<div class="er">'+dh+'<div class="erh"><h4>'+ma.length+' ad'+(ma.length>1?'s':'')+' for <span style="color:var(--acc)">'+em+'</span></h4></div>'+ma.map(function(m){var fk=m.fk,v=m.v,sk=sI(fk),n=gN(v),p=gPr(v),r=gR(v),st=gS(r),x=iE(v),co=gCo(r,x),f=fC(r),h=!!v.home,o=gO(v),hr=h?gHR(v):0;return'<div class="ec"><div class="ect"><div class="vt">'+gI(v)+'</div><div class="evi"><div class="evn">'+n+'</div><div class="evm">'+p+' &middot; Path: <span style="color:var(--acc)">'+fk+'</span> '+(x?'<span class="bg bg-e" style="margin-left:4px"><i class="fas fa-arrows-rotate" style="font-size:8px"></i> Extended</span>':'')+' '+(h?'<span class="bg bg-h" style="margin-left:4px"><i class="fas fa-house" style="font-size:8px"></i> Home</span>':'')+'</div><div class="evc" style="color:'+co+'" data-c="s-'+sk+'">'+(r>0?f:'EXPIRED')+'</div><div class="evs">'+gB(st,x)+'</div>'+(h?'<div style="font-size:11px;color:var(--cyn);margin-top:4px"><i class="fas fa-house" style="font-size:9px"></i> Home: <span data-hc="'+sk+'">'+fH(hr)+'</span></div>':'')+'</div></div><div class="eca"><button class="bt bt-e" onclick="exV(\''+fk+'\');setTimeout(function(){srch()},800)"><i class="fas fa-arrows-rotate"></i> Extend +'+EPD+'d</button>'+(h?'<button class="bt bt-ho" onclick="tgH(\''+fk+'\',0);setTimeout(function(){srch()},800)"><i class="fas fa-house-circle-xmark"></i> Remove Home</button>':'<button class="bt bt-h" onclick="shHD(\''+fk+'\')"><i class="fas fa-house"></i> Add to Home</button>')+'<span id="hd_'+sk+'"></span></div></div>'}).join('')+'</div>'}
+/* ========== SEARCH ========== */
+function srch(){var em=document.getElementById('EI').value.trim().toLowerCase();if(!em){T('Enter an email','info');return}var rc=document.getElementById('ER');rc.innerHTML='<div class="er"><div style="text-align:center;padding:30px;color:var(--mut)"><i class="fas fa-spinner fa-spin" style="font-size:24px;display:block;margin-bottom:8px"></i>Searching...</div></div>';var mu=[],mi={};Object.entries(UD).forEach(function(e){if((e[1].email||'').toLowerCase()===em){mu.push(e[0]);mi[e[0]]=e[1]}});var ma=[],ms=new Set();mu.forEach(function(uid){Object.entries(FV).forEach(function(e){var fk=e[0],v=e[1];if(ms.has(fk))return;if(gO(v)===uid){ms.add(fk);ma.push({fk:fk,v:v})}})});Object.entries(FV).forEach(function(e){var fk=e[0],v=e[1];if(ms.has(fk))return;var ve=(v.email||v.sellerEmail||v.userEmail||v.ownerEmail||'').toLowerCase();if(ve===em){ms.add(fk);ma.push({fk:fk,v:v})}});var dh='';if(mu.length>0){dh='<div class="di"><i class="fas fa-check-circle" style="color:var(--grn);margin-right:6px"></i>Found in users table<br>';mu.forEach(function(uid){dh+='UID: <strong>'+uid+'</strong> → '+(mi[uid].name||mi[uid].displayName||mi[uid].username||'No name')+'<br>'});dh+='<br>Total vehicles: <strong>'+Object.keys(FV).length+'</strong><br>';var ao=new Set();Object.values(FV).forEach(function(v){var o=gO(v);if(o)ao.add(o)});dh+='OwnerIds: <strong>'+ao.size+'</strong> — '+Array.from(ao).slice(0,5).map(function(id){return'<strong>'+id+'</strong>'}).join(', ')+'<br></div>'}else{dh='<div class="di"><i class="fas fa-exclamation-triangle" style="color:var(--acc);margin-right:6px"></i>No user with email <strong>'+em+'</strong></div>'}if(!ma.length){rc.innerHTML='<div class="er">'+dh+'<div class="es" style="padding:40px 20px"><i class="fas fa-search" style="font-size:36px"></i><p>No ads for <strong style="color:var(--pri)">'+em+'</strong></p></div></div>';return}rc.innerHTML='<div class="er">'+dh+'<div class="erh"><h4>'+ma.length+' ad'+(ma.length>1?'s':'')+' for <span style="color:var(--acc)">'+em+'</span></h4></div>'+ma.map(function(m){var fk=m.fk,v=m.v,sk=sI(fk),n=gN(v),p=gPr(v),r=gR(v),st=gS(r),x=iE(v),co=gCo(r,x),f=fC(r),h=!!v.home,o=gO(v),hr=h?gHR(v):0;return'<div class="ec"><div class="ect"><div class="vt">'+gI(v)+'</div><div class="evi"><div class="evn">'+n+'</div><div class="evm">'+p+'</div><div class="evc" style="color:'+co+'" data-c="s-'+sk+'">'+(r>0?f:'EXPIRED')+'</div><div class="evs">'+gB(st,x)+'</div>'+(h?'<div style="font-size:11px;color:var(--cyn);margin-top:4px"><i class="fas fa-house" style="font-size:9px"></i> Home: <span data-hc="'+sk+'">'+fH(hr)+'</span></div>':'')+'</div></div><div style="margin-top:8px;padding:8px 12px;background:var(--main);border-radius:6px;font-size:11px;color:var(--cyn);font-family:JetBrains Mono,monospace;word-break:break-all"><i class="fas fa-database" style="margin-right:4px"></i>vehicles/<strong style="color:var(--acc)">'+fk+'</strong>'+(h?'<span class="bg bg-h" style="margin-left:8px"><i class="fas fa-house" style="font-size:8px"></i> Home</span>':'')+'</div><div class="eca"><button class="bt bt-e" onclick="exV(\''+fk+'\');setTimeout(function(){srch()},800)"><i class="fas fa-arrows-rotate"></i> Extend +'+EPD+'d</button>'+(h?'<button class="bt bt-ho" onclick="tgH(\''+fk+'\',0);setTimeout(function(){srch()},800)"><i class="fas fa-house-circle-xmark"></i> Remove Home</button>':'<button class="bt bt-h" onclick="shHD(\''+fk+'\')"><i class="fas fa-house"></i> Add to Home</button>')+'<span id="hd_'+sk+'"></span></div></div>'}).join('')+'</div>'}
 
 function sM(t,m,c){document.getElementById('MC').innerHTML='<div class="mo" onclick="cM(event)"><div class="mb" onclick="event.stopPropagation()"><h3>'+t+'</h3><p>'+m+'</p><div class="ma"><button class="bt bt-g" onclick="cM()">Cancel</button><button class="bt bt-d" id="MCB"><i class="fas fa-trash"></i> Confirm</button></div></div></div>';document.getElementById('MCB').addEventListener('click',function(){cM();c()})}
 function cM(e){if(e&&e.target!==e.currentTarget)return;document.getElementById('MC').innerHTML=''}
 function cfP(){sM('Purge','Delete all expired ads?',function(){pE(true)})}
 
-function aL(){if(la)return;la=true;db.ref('settings').on('value',function(s){apS(s.val()||{})});db.ref('vehicles').on('value',function(s){VR=s.val()||{};FV=flV(VR);Object.entries(FV).forEach(function(e){var fk=e[0],v=e[1];var t=gT(v),ot=v.timestamp||0;if(ot&&t>ot)v._ef=true});uSt();rV();rD();Object.entries(FV).forEach(function(e){var fk=e[0],v=e[1];if(gR(v)<=0&&gT(v)>0){db.ref(gP(fk)).remove();T('Auto-deleted: '+gN(v),'danger')}})},function(){T('Vehicles error','danger')});db.ref('users').on('value',function(s){UD=s.val()||{};uSt();rU()},function(){T('Users error','danger')})}
+/* ========== LISTENERS ========== */
+function aL(){if(la)return;la=true;
+  db.ref('settings').on('value',function(s){apS(s.val()||{})});
+  db.ref('vehicles').on('value',function(s){
+    VR=s.val()||{};
+    FV=flV(VR);
+    Object.keys(FV).forEach(function(fk){var v=FV[fk];var t=gT(v),ot=v.timestamp||0;if(ot&&t>ot)v._ef=true});
+    uSt();rV();rD();
+    Object.entries(FV).forEach(function(e){var fk=e[0],v=e[1];if(gR(v)<=0&&gT(v)>0){db.ref(gP(fk)).remove();T('Auto-deleted: '+gN(v)+' ('+fk+')','danger')}});
+  },function(){T('Vehicles error','danger')});
+  db.ref('users').on('value',function(s){UD=s.val()||{};uSt();rU()},function(){T('Users error','danger')});
+}
 </script>
 </body>
 </html>
