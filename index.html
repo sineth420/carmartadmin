@@ -67,7 +67,8 @@ body{font-family:'Outfit',sans-serif;background:var(--deep);color:var(--pri);min
 .th h3{font-size:16px;font-weight:600}
 .sbx{background:var(--main);border:1px solid var(--bdr);border-radius:8px;padding:8px 12px;color:var(--pri);font-size:13px;font-family:'Outfit',sans-serif;width:220px;outline:none;transition:border-color .2s}
 .sbx:focus{border-color:var(--acc)}
-.dt{width:100%;border-collapse:collapse}
+.tov{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.dt{width:100%;border-collapse:collapse;min-width:600px}
 .dt th{text-align:left;padding:12px 20px;font-size:11px;font-weight:600;color:var(--mut);text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid var(--bdr);background:var(--main)}
 .dt td{padding:14px 20px;font-size:14px;border-bottom:1px solid var(--bdr);vertical-align:middle}
 .dt tr:last-child td{border-bottom:none}
@@ -205,19 +206,19 @@ body{font-family:'Outfit',sans-serif;background:var(--deep);color:var(--pri);min
       </div>
       <div class="cw"><h3><i class="fas fa-chart-line" style="margin-right:6px;color:var(--acc)"></i> Ads Posted (Last 7 Days)</h3><canvas id="ADGRAPH" height="100"></canvas></div>
       <div class="tw"><div class="th"><h3>Recent Ads</h3><button class="bt bt-g" onclick="swP('vehicles')"><i class="fas fa-arrow-right"></i> All</button></div>
-      <table class="dt"><thead><tr><th>Vehicle</th><th>Price</th><th>Status</th><th>Expires In</th></tr></thead><tbody id="DTB"><tr><td colspan="4"><div class="es"><i class="fas fa-spinner fa-spin"></i><p>Loading...</p></div></td></tr></tbody></table></div>
+      <div class="tov"><table class="dt"><thead><tr><th>Vehicle</th><th>Price</th><th>Status</th><th>Expires In</th></tr></thead><tbody id="DTB"><tr><td colspan="4"><div class="es"><i class="fas fa-spinner fa-spin"></i><p>Loading...</p></div></td></tr></tbody></table></div></div>
     </div>
 
     <div class="sp" id="P-vehicles">
       <div class="ph"><h2>Vehicles</h2><p>All listings with countdown</p></div>
       <div class="tw"><div class="th"><h3>All <span style="color:var(--mut);font-weight:400;font-size:13px;margin-left:8px" id="VC"></span></h3><input type="text" class="sbx" placeholder="Search..." id="VS" oninput="rV()"></div>
-      <table class="dt"><thead><tr><th>Vehicle</th><th>Price</th><th>Status</th><th>Countdown</th><th>Home</th></tr></thead><tbody id="VTB"><tr><td colspan="5"><div class="es"><i class="fas fa-spinner fa-spin"></i><p>Loading...</p></div></td></tr></tbody></table></div>
+      <div class="tov"><table class="dt"><thead><tr><th>Vehicle</th><th>Price</th><th>Status</th><th>Countdown</th><th>Home</th></tr></thead><tbody id="VTB"><tr><td colspan="5"><div class="es"><i class="fas fa-spinner fa-spin"></i><p>Loading...</p></div></td></tr></tbody></table></div></div>
     </div>
 
     <div class="sp" id="P-homeads">
       <div class="ph"><h2>Home Ads</h2><p>Vehicles currently featured on homepage</p></div>
       <div class="tw"><div class="th"><h3>Featured <span style="color:var(--mut);font-weight:400;font-size:13px;margin-left:8px" id="HAC"></span></h3></div>
-      <table class="dt"><thead><tr><th>Vehicle</th><th>Price</th><th>Owner</th><th>Home Expires In</th></tr></thead><tbody id="HATB"><tr><td colspan="4"><div class="es"><i class="fas fa-spinner fa-spin"></i><p>Loading...</p></div></td></tr></tbody></table></div>
+      <div class="tov"><table class="dt"><thead><tr><th>Vehicle</th><th>Price</th><th>Owner</th><th>Home Expires In</th></tr></thead><tbody id="HATB"><tr><td colspan="4"><div class="es"><i class="fas fa-spinner fa-spin"></i><p>Loading...</p></div></td></tr></tbody></table></div></div>
     </div>
 
     <div class="sp" id="P-search">
@@ -236,7 +237,7 @@ body{font-family:'Outfit',sans-serif;background:var(--deep);color:var(--pri);min
     <div class="sp" id="P-users">
       <div class="ph"><h2>Users</h2><p>Registered accounts</p></div>
       <div class="tw"><div class="th"><h3>Users <span style="color:var(--mut);font-weight:400;font-size:13px;margin-left:8px" id="UC"></span></h3><input type="text" class="sbx" placeholder="Search..." id="US" oninput="rU()"></div>
-      <table class="dt"><thead><tr><th>User</th><th>Email</th><th>UID</th></tr></thead><tbody id="UTB"><tr><td colspan="3"><div class="es"><i class="fas fa-spinner fa-spin"></i><p>Loading...</p></div></td></tr></tbody></table></div>
+      <div class="tov"><table class="dt"><thead><tr><th>User</th><th>Email</th><th>UID</th></tr></thead><tbody id="UTB"><tr><td colspan="3"><div class="es"><i class="fas fa-spinner fa-spin"></i><p>Loading...</p></div></td></tr></tbody></table></div></div>
     </div>
 
     <div class="sp" id="P-settings">
@@ -327,7 +328,6 @@ function iE(v){return v._ef||false}
 function gB(s,x){if(x)return'<span class="bg bg-e"><i class="fas fa-arrows-rotate" style="font-size:8px"></i> Extended</span>';var m={active:'<span class="bg bg-a"><i class="fas fa-circle" style="font-size:6px"></i> Active</span>',expiring:'<span class="bg bg-x"><i class="fas fa-circle" style="font-size:6px"></i> Expiring</span>',expired:'<span class="bg bg-d"><i class="fas fa-circle" style="font-size:6px"></i> Expired</span>'};return m[s]||m.active}
 function gCo(ms,x){if(x){if(ms/D<=0)return'var(--red)';return'var(--pur)'}var d=ms/D;if(d<=0)return'var(--red)';if(d<=3)return'var(--acc)';return'var(--grn)'}
 function gHR(v){if(!v.timestamphome)return 0;return v.timestamphome-Date.now()}
-function fH(ms){if(ms<=0)return'Expired';var d=Math.floor(ms/D),h=Math.floor((ms%D)/36e5),m=Math.floor((ms%36e5)/6e4);return d+'d '+h+'h '+m+'m'}
 function gI(v){if(v.imageUrl)return'<img src="'+v.imageUrl+'" alt="" onerror="this.parentElement.innerHTML=\'<i class=\\\'fas fa-car\\\'></i>\'">';return'<i class="fas fa-car"></i>'}
 function gN(v){return v.name||v.title||v.vehicleName||((v.brand||'')+' '+(v.model||'')).trim()||'Unnamed'}
 function gPr(v){var p=v.price||v.cost||0;return typeof p==='number'?'Rs. '+p.toLocaleString():p||'—'}
@@ -341,7 +341,7 @@ function rV(){var s=(document.getElementById('VS')?document.getElementById('VS')
 
 function rD(){var en=Object.entries(FV).sort(function(a,b){return gT(b[1])-gT(a[1])}).slice(0,5);var tb=document.getElementById('DTB');if(!en.length){tb.innerHTML='<tr><td colspan="4"><div class="es"><i class="fas fa-car-side"></i><p>No vehicles</p></div></td></tr>';return}tb.innerHTML=en.map(function(e){var fk=e[0],v=e[1],n=gN(v),p=gPr(v),r=gR(v),st=gS(r),x=iE(v),co=gCo(r,x),f=fC(r);return'<tr><td><div class="vc"><div class="vt">'+gI(v)+'</div><span style="font-weight:600">'+n+'</span></div></td><td><span class="pr">'+p+'</span></td><td>'+gB(st,x)+'</td><td><span class="ct" style="color:'+co+'" data-c="d-'+fk+'">'+f+'</span></td></tr>'}).join('')}
 
-function rH(){var en=Object.entries(FV).filter(function(e){return e[1].home===true});document.getElementById('HAC').textContent='('+en.length+')';document.getElementById('HB').textContent=en.length;var tb=document.getElementById('HATB');if(!en.length){tb.innerHTML='<tr><td colspan="4"><div class="es"><i class="fas fa-house"></i><p>No vehicles on home</p></div></td></tr>';return}tb.innerHTML=en.map(function(e){var fk=e[0],v=e[1],n=gN(v),p=gPr(v),hr=gHR(v),uid=gO(v),user=getUserInfo(uid);return'<tr><td><div class="vc"><div class="vt">'+gI(v)+'</div><div><div style="font-weight:600">'+n+'</div><div style="font-size:11px;color:var(--mut)">'+fk+'</div></div></div></td><td><span class="pr">'+p+'</span></td><td><div class="uc"><div class="av">'+gU(user.name)+'</div><div><div style="font-weight:600">'+user.name+'</div><div style="font-size:11px;color:var(--mut)">'+user.email+'</div></div></div></td><td><span class="ct" style="color:'+(hr>0?'var(--cyn)':'var(--red)')+'" data-hc="'+fk+'">'+fH(hr)+'</span></td></tr>'}).join('')}
+function rH(){var en=Object.entries(FV).filter(function(e){return e[1].home===true});document.getElementById('HAC').textContent='('+en.length+')';document.getElementById('HB').textContent=en.length;var tb=document.getElementById('HATB');if(!en.length){tb.innerHTML='<tr><td colspan="4"><div class="es"><i class="fas fa-house"></i><p>No vehicles on home</p></div></td></tr>';return}tb.innerHTML=en.map(function(e){var fk=e[0],v=e[1],n=gN(v),p=gPr(v),hr=gHR(v),uid=gO(v),user=getUserInfo(uid);return'<tr><td><div class="vc"><div class="vt">'+gI(v)+'</div><div><div style="font-weight:600">'+n+'</div><div style="font-size:11px;color:var(--mut)">'+fk+'</div></div></div></td><td><span class="pr">'+p+'</span></td><td><div class="uc"><div class="av">'+gU(user.name)+'</div><div><div style="font-weight:600">'+user.name+'</div><div style="font-size:11px;color:var(--mut)">'+user.email+'</div></div></div></td><td><span class="ct" style="color:'+(hr>0?'var(--cyn)':'var(--red)')+'" data-ch="'+fk+'">'+fC(hr)+'</span></td></tr>'}).join('')}
 
 function rU(){var s=(document.getElementById('US')?document.getElementById('US').value:'').toLowerCase();var en=Object.entries(UD).filter(function(e){var id=e[0],u=e[1],n=(u.name||u.displayName||u.username||'').toLowerCase(),em=(u.email||'').toLowerCase();return n.includes(s)||em.includes(s)||id.toLowerCase().includes(s)});document.getElementById('UC').textContent='('+en.length+')';var tb=document.getElementById('UTB');if(!en.length){tb.innerHTML='<tr><td colspan="3"><div class="es"><i class="fas fa-users"></i><p>No users</p></div></td></tr>';return}tb.innerHTML=en.map(function(e){var id=e[0],u=e[1],n=u.name||u.displayName||u.username||'Unknown',em=u.email||'—';return'<tr><td><div class="uc"><div class="av">'+gU(n)+'</div><div><div style="font-weight:600">'+n+'</div></div></div></td><td style="font-size:13px;color:var(--sec)">'+em+'</td><td style="font-size:11px;color:var(--mut);font-family:JetBrains Mono,monospace">'+id+'</td></tr>'}).join('')}
 
@@ -433,7 +433,41 @@ function uSt(){
     document.getElementById('UB').textContent=uc;
 }
 
-function sCT(){if(ci)clearInterval(ci);ci=setInterval(function(){document.querySelectorAll('[data-c]').forEach(function(el){var fk=el.getAttribute('data-c');if(fk.indexOf('d-')===0)fk=fk.substring(2);if(fk.indexOf('s-')===0)fk=fk.substring(2);var v=FV[fk];if(!v)return;var r=gR(v);el.textContent=fC(r);el.style.color=gCo(r,iE(v))});document.querySelectorAll('[data-b]').forEach(function(el){var fk=el.getAttribute('data-b');var v=FV[fk];if(!v)return;var r=gR(v);el.style.width=gPc(r)+'%';el.style.background=gCo(r,iE(v))});document.querySelectorAll('[data-hc]').forEach(function(el){var fk=el.getAttribute('data-hc');var v=FV[fk];if(!v)return;el.textContent=fH(gHR(v))})},1000)}
+/* ========== TIMERS ========== */
+function sCT(){
+    if(ci)clearInterval(ci);
+    ci=setInterval(function(){
+        // Standard Ad Countdown
+        document.querySelectorAll('[data-c]').forEach(function(el){
+            var fk=el.getAttribute('data-c');
+            if(fk.indexOf('d-')===0)fk=fk.substring(2);
+            if(fk.indexOf('s-')===0)fk=fk.substring(2);
+            var v=FV[fk];
+            if(!v)return;
+            var r=gR(v);
+            el.textContent=fC(r);
+            el.style.color=gCo(r,iE(v));
+        });
+        // Ad Progress Bars
+        document.querySelectorAll('[data-b]').forEach(function(el){
+            var fk=el.getAttribute('data-b');
+            var v=FV[fk];if(!v)return;
+            var r=gR(v);
+            el.style.width=gPc(r)+'%';
+            el.style.background=gCo(r,iE(v));
+        });
+        // Home Ad Countdown
+        document.querySelectorAll('[data-ch]').forEach(function(el){
+            var fk=el.getAttribute('data-ch');
+            var v=FV[fk];
+            if(!v)return;
+            var r=gHR(v);
+            el.textContent=fC(r);
+            el.style.color=r>0?'var(--cyn)':'var(--red)';
+        });
+    },1000);
+}
+
 function sAC(){if(ai)clearInterval(ai);ai=setInterval(function(){pE(false)},60000)}
 function pE(sm){if(sm===undefined)sm=true;var td=[];Object.keys(FV).forEach(function(fk){if(gR(FV[fk])<=0&&gT(FV[fk])>0)td.push(fk)});if(!td.length){if(sm)T('No expired','info');return}var updates={};td.forEach(function(fk){updates[fk]=null});db.ref('vehicles').update(updates).then(function(){T('Deleted '+td.length+' expired','danger')}).catch(function(e){T('Purge failed: '+e.message,'danger')})}
 
@@ -443,7 +477,7 @@ function tgH(fk,dy){var v=FV[fk];if(!v)return;var path=gP(fk);T('Writing to: '+p
 function shHD(fk){var c=document.getElementById('hd_'+sI(fk));if(!c)return;c.innerHTML='<span class="hdp"><span style="font-size:11px;color:var(--mut)">For:</span><button class="hdb" style="background:var(--cynd);color:var(--cyn)" onclick="tgH(\''+fk+'\',7);setTimeout(function(){srch()},800)">7d</button><button class="hdb" style="background:var(--cyn);color:#fff" onclick="tgH(\''+fk+'\',14);setTimeout(function(){srch()},800)">14d</button></span>'}
 
 /* ========== SEARCH ========== */
-function srch(){var em=document.getElementById('EI').value.trim().toLowerCase();if(!em){T('Enter an email','info');return}var rc=document.getElementById('ER');rc.innerHTML='<div class="er"><div style="text-align:center;padding:30px;color:var(--mut)"><i class="fas fa-spinner fa-spin" style="font-size:24px;display:block;margin-bottom:8px"></i>Searching...</div></div>';var mu=[],mi={};Object.entries(UD).forEach(function(e){if((e[1].email||'').toLowerCase()===em){mu.push(e[0]);mi[e[0]]=e[1]}});var ma=[],ms=new Set();mu.forEach(function(uid){Object.entries(FV).forEach(function(e){var fk=e[0],v=e[1];if(ms.has(fk))return;if(gO(v)===uid){ms.add(fk);ma.push({fk:fk,v:v})}})});Object.entries(FV).forEach(function(e){var fk=e[0],v=e[1];if(ms.has(fk))return;var ve=(v.email||v.sellerEmail||v.userEmail||v.ownerEmail||'').toLowerCase();if(ve===em){ms.add(fk);ma.push({fk:fk,v:v})}});var dh='';if(mu.length>0){dh='<div class="di"><i class="fas fa-check-circle" style="color:var(--grn);margin-right:6px"></i>Found in users table<br>';mu.forEach(function(uid){dh+='UID: <strong>'+uid+'</strong> → '+(mi[uid].name||mi[uid].displayName||mi[uid].username||'No name')+'<br>'});dh+='<br>Total vehicles: <strong>'+Object.keys(FV).length+'</strong><br>';var ao=new Set();Object.values(FV).forEach(function(v){var o=gO(v);if(o)ao.add(o)});dh+='OwnerIds: <strong>'+ao.size+'</strong> — '+Array.from(ao).slice(0,5).map(function(id){return'<strong>'+id+'</strong>'}).join(', ')+'<br></div>'}else{dh='<div class="di"><i class="fas fa-exclamation-triangle" style="color:var(--acc);margin-right:6px"></i>No user with email <strong>'+em+'</strong></div>'}if(!ma.length){rc.innerHTML='<div class="er">'+dh+'<div class="es" style="padding:40px 20px"><i class="fas fa-search" style="font-size:36px"></i><p>No ads for <strong style="color:var(--pri)">'+em+'</strong></p></div></div>';return}rc.innerHTML='<div class="er">'+dh+'<div class="erh"><h4>'+ma.length+' ad'+(ma.length>1?'s':'')+' for <span style="color:var(--acc)">'+em+'</span></h4></div>'+ma.map(function(m){var fk=m.fk,v=m.v,sk=sI(fk),n=gN(v),p=gPr(v),r=gR(v),st=gS(r),x=iE(v),co=gCo(r,x),f=fC(r),h=!!v.home,o=gO(v),hr=h?gHR(v):0;return'<div class="ec"><div class="ect"><div class="vt">'+gI(v)+'</div><div class="evi"><div class="evn">'+n+'</div><div class="evm">'+p+'</div><div class="evc" style="color:'+co+'" data-c="s-'+sk+'">'+(r>0?f:'EXPIRED')+'</div><div class="evs">'+gB(st,x)+'</div>'+(h?'<div style="font-size:11px;color:var(--cyn);margin-top:4px"><i class="fas fa-house" style="font-size:9px"></i> Home: <span data-hc="'+sk+'">'+fH(hr)+'</span></div>':'')+'</div></div><div style="margin-top:8px;padding:8px 12px;background:var(--main);border-radius:6px;font-size:11px;color:var(--cyn);font-family:JetBrains Mono,monospace;word-break:break-all"><i class="fas fa-database" style="margin-right:4px"></i>vehicles/<strong style="color:var(--acc)">'+fk+'</strong>'+(h?'<span class="bg bg-h" style="margin-left:8px"><i class="fas fa-house" style="font-size:8px"></i> Home</span>':'')+'</div><div class="eca"><button class="bt bt-e" onclick="exV(\''+fk+'\');setTimeout(function(){srch()},800)"><i class="fas fa-arrows-rotate"></i> Extend +'+EPD+'d</button>'+(h?'<button class="bt bt-ho" onclick="tgH(\''+fk+'\',0);setTimeout(function(){srch()},800)"><i class="fas fa-house-circle-xmark"></i> Remove Home</button>':'<button class="bt bt-h" onclick="shHD(\''+fk+'\')"><i class="fas fa-house"></i> Add to Home</button>')+'<span id="hd_'+sk+'"></span></div></div>'}).join('')+'</div>'}
+function srch(){var em=document.getElementById('EI').value.trim().toLowerCase();if(!em){T('Enter an email','info');return}var rc=document.getElementById('ER');rc.innerHTML='<div class="er"><div style="text-align:center;padding:30px;color:var(--mut)"><i class="fas fa-spinner fa-spin" style="font-size:24px;display:block;margin-bottom:8px"></i>Searching...</div></div>';var mu=[],mi={};Object.entries(UD).forEach(function(e){if((e[1].email||'').toLowerCase()===em){mu.push(e[0]);mi[e[0]]=e[1]}});var ma=[],ms=new Set();mu.forEach(function(uid){Object.entries(FV).forEach(function(e){var fk=e[0],v=e[1];if(ms.has(fk))return;if(gO(v)===uid){ms.add(fk);ma.push({fk:fk,v:v})}})});Object.entries(FV).forEach(function(e){var fk=e[0],v=e[1];if(ms.has(fk))return;var ve=(v.email||v.sellerEmail||v.userEmail||v.ownerEmail||'').toLowerCase();if(ve===em){ms.add(fk);ma.push({fk:fk,v:v})}});var dh='';if(mu.length>0){dh='<div class="di"><i class="fas fa-check-circle" style="color:var(--grn);margin-right:6px"></i>Found in users table<br>';mu.forEach(function(uid){dh+='UID: <strong>'+uid+'</strong> → '+(mi[uid].name||mi[uid].displayName||mi[uid].username||'No name')+'<br>'});dh+='<br>Total vehicles: <strong>'+Object.keys(FV).length+'</strong><br>';var ao=new Set();Object.values(FV).forEach(function(v){var o=gO(v);if(o)ao.add(o)});dh+='OwnerIds: <strong>'+ao.size+'</strong> — '+Array.from(ao).slice(0,5).map(function(id){return'<strong>'+id+'</strong>'}).join(', ')+'<br></div>'}else{dh='<div class="di"><i class="fas fa-exclamation-triangle" style="color:var(--acc);margin-right:6px"></i>No user with email <strong>'+em+'</strong></div>'}if(!ma.length){rc.innerHTML='<div class="er">'+dh+'<div class="es" style="padding:40px 20px"><i class="fas fa-search" style="font-size:36px"></i><p>No ads for <strong style="color:var(--pri)">'+em+'</strong></p></div></div>';return}rc.innerHTML='<div class="er">'+dh+'<div class="erh"><h4>'+ma.length+' ad'+(ma.length>1?'s':'')+' for <span style="color:var(--acc)">'+em+'</span></h4></div>'+ma.map(function(m){var fk=m.fk,v=m.v,sk=sI(fk),n=gN(v),p=gPr(v),r=gR(v),st=gS(r),x=iE(v),co=gCo(r,x),f=fC(r),h=!!v.home,o=gO(v),hr=h?gHR(v):0;return'<div class="ec"><div class="ect"><div class="vt">'+gI(v)+'</div><div class="evi"><div class="evn">'+n+'</div><div class="evm">'+p+'</div><div class="evc" style="color:'+co+'" data-c="s-'+sk+'">'+(r>0?f:'EXPIRED')+'</div><div class="evs">'+gB(st,x)+'</div>'+(h?'<div style="font-size:11px;color:var(--cyn);margin-top:4px"><i class="fas fa-house" style="font-size:9px"></i> Home: <span data-ch="'+fk+'">'+fC(hr)+'</span></div>':'')+'</div></div><div style="margin-top:8px;padding:8px 12px;background:var(--main);border-radius:6px;font-size:11px;color:var(--cyn);font-family:JetBrains Mono,monospace;word-break:break-all"><i class="fas fa-database" style="margin-right:4px"></i>vehicles/<strong style="color:var(--acc)">'+fk+'</strong>'+(h?'<span class="bg bg-h" style="margin-left:8px"><i class="fas fa-house" style="font-size:8px"></i> Home</span>':'')+'</div><div class="eca"><button class="bt bt-e" onclick="exV(\''+fk+'\');setTimeout(function(){srch()},800)"><i class="fas fa-arrows-rotate"></i> Extend +'+EPD+'d</button>'+(h?'<button class="bt bt-ho" onclick="tgH(\''+fk+'\',0);setTimeout(function(){srch()},800)"><i class="fas fa-house-circle-xmark"></i> Remove Home</button>':'<button class="bt bt-h" onclick="shHD(\''+fk+'\')"><i class="fas fa-house"></i> Add to Home</button>')+'<span id="hd_'+sk+'"></span></div></div>'}).join('')+'</div>'}
 
 function sM(t,m,c){document.getElementById('MC').innerHTML='<div class="mo" onclick="cM(event)"><div class="mb" onclick="event.stopPropagation()"><h3>'+t+'</h3><p>'+m+'</p><div class="ma"><button class="bt bt-g" onclick="cM()">Cancel</button><button class="bt bt-d" id="MCB"><i class="fas fa-trash"></i> Confirm</button></div></div></div>';document.getElementById('MCB').addEventListener('click',function(){cM();c()})}
 function cM(e){if(e&&e.target!==e.currentTarget)return;document.getElementById('MC').innerHTML=''}
